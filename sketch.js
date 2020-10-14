@@ -1,6 +1,6 @@
-// 16 Squares - Sliding Puzzle
+// Sliding Puzzle - Major Project
 // Kassie Tan
-// October 9th, 2020
+// DUE DATE
 //
 // Extra for Experts:
 // - I spent a lot of time working on the visual design of the code
@@ -8,13 +8,9 @@
 // - I (might) continue working on this for my major project by creating some sort of auto-solve function (this is, of course, subject to change)
 
 
-const GRIDSIZE = 4;
+let gridSize = 3;
 let grid;
-let gridSolution = 
-  [[1, 2, 3, 4],
-    [5, 6, 7, 8],
-    [9, 10, 11, 12],
-    [13, 14, 15, 0]];
+let gridSolution;
 
 let sideLength;
 let rectRoundEdge;
@@ -26,6 +22,7 @@ let emptySpaceX, emptySpaceY;
 let winState = false;
 let needHelp = false;
 
+let consistentRatio; //the ratio that doesn't change, no matter the gridSize or gridLength
 let buttonGap, buttonHeight, buttonWidth, buttonTopBottomOffset;
 
 let montserratSemiBoldFont, domineBoldFont;
@@ -35,20 +32,41 @@ function preload() {
   //load the fonts
   montserratSemiBoldFont = loadFont("assets/Montserrat-SemiBold.ttf");
   domineBoldFont = loadFont("assets/Domine-Bold.ttf");
+
+  //load the grid solution (based on the gridSize)
+  if (gridSize === 4) {
+    gridSolution = loadStrings("assets/solution-4.txt");
+  }
+  else if (gridSize === 3) {
+    gridSolution = loadStrings("assets/solution-3.txt");
+  }
 }
 
 function setup() {
   createCanvas(windowWidth, windowHeight);
 
+  //convert grid solution (currently a string from .txt file) into a 2d array
+  for (let i=0; i<gridSolution.length; i++) {
+    gridSolution[i] = gridSolution[i].split(",");
+  }
+
+  //loop through the gridSolution and turn the strings into numbers
+  for (let y=0; y<gridSize; y++) {
+    for (let x=0; x<gridSize; x++) {
+      gridSolution[y][x] = int(gridSolution[y][x]);
+    }
+  }
+
   grid = createRandomGrid(); //create randomized 2d array for the gameboard
 
-  findSideLength(); //side length of each square
+
+  findSideLength(); //side length of the square tiles
 
   rectRoundEdge = sideLength / 10; //how rounded the edges are
 
   //find the offset values to centre the grid in the middle of the canvas
-  widthOffset = width/2 - sideLength*2;
-  heightOffset = height/2 - sideLength*2;
+  widthOffset = width/2 - sideLength*(gridSize/2);
+  heightOffset = height/2 - sideLength*(gridSize/2);
 
   //determining dimensions of the "buttons" (title, restart, question buttons)
   findButtonDimensions();
@@ -76,6 +94,7 @@ function draw() {
     drawWinScreen();
   }
 
+
   if (needHelp) {
     //boolean needHelp is triggered by clicking the questionButton
     drawHelpScreen();
@@ -85,14 +104,19 @@ function draw() {
 
 
 function createRandomGrid() {
-  let listOfNumbers = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15];
+  let listOfNumbers = []; 
   let randomGrid = [];
   let someIndex; //local variable to randomize the order of numbers in the 2d array
 
-  for (let i = 0; i < 4; i++) {
+  //create a list of all possible numbers (from 0 to N^2-1 where N=gridSize)
+  for (let i=0; i< gridSize*gridSize; i++) {
+    listOfNumbers.push(i); 
+  }
+
+  for (let i = 0; i < gridSize; i++) {
     randomGrid.push([]);
 
-    for (let j = 0; j < 4; j++) {
+    for (let j = 0; j < gridSize; j++) {
       //choose a  value from the listOFNumbers with a random index value to push into the randomGrid
       someIndex = floor(random(listOfNumbers.length));
       randomGrid[i].push(listOfNumbers[someIndex]);
@@ -108,13 +132,15 @@ function createRandomGrid() {
 
 
 function findSideLength() {
-  //find the side length of the squares based on the dimensions of the canvas
+  //find the side length of the squares based on the dimensions of the canvas and gridSize
 
   if (height <= width) {
-    sideLength = height / 5;
+    sideLength = height/5.5 * 4 / gridSize; //original sideLength = (height / 5.5); i want the same total width (hence *4) but for the respective gridSize (hence /gridSize)
+    consistentRatio = height/5.5; //the ratio that doesn't change, no matter the gridSize or gridLength
   }
   else {
-    sideLength = width / 5;
+    sideLength = width/5.5 * 4 / gridSize;
+    consistentRatio = width/5.5; //the ratio that doesn't change, no matter the gridSize or gridLength
   }
 }
 
@@ -137,7 +163,7 @@ function drawBackground() {
 
 function drawLinePattern() {
   //draw settings for the line background pattern
-  strokeWeight(sideLength / 150);
+  strokeWeight(1);
   stroke("#45252A");
   let forwardSlash = true;
 
@@ -163,11 +189,11 @@ function drawGameboardFrame() {
 
   //rectangular gameboard frame 
   fill("#45252A");
-  rect(width / 2, height / 2, sideLength * 4.3, sideLength * 4.3, rectRoundEdge); 
+  rect(width / 2, height / 2, sideLength * (gridSize * 1.1), sideLength * (gridSize * 1.1), rectRoundEdge); 
 
   //fill in the gaps from the rounded corners of the gameboard
   fill("#9D4C5A");
-  rect(width / 2, height / 2, sideLength * 3, sideLength * 3, rectRoundEdge);
+  rect(width / 2, height / 2, sideLength * (gridSize - 1), sideLength * (gridSize - 1), rectRoundEdge);
 }
 
 
@@ -203,8 +229,8 @@ function drawButtonText() {
 
   //title text
   text(" 16", 0, buttonTopBottomOffset - buttonGap / 2, buttonWidth, buttonHeight);
-  textSize(sideLength / 7); //"SQUARES" must be written smaller in order to "fit" in the button
-  text("SQUA\nRES !", 0, buttonTopBottomOffset + buttonHeight + buttonGap / 2, buttonWidth, buttonHeight);
+  textSize(sideLength / 6); //"TILES" must be written smaller in order to "fit" in the button
+  text("TIL\nES !", 0, buttonTopBottomOffset + buttonHeight + buttonGap / 2, buttonWidth, buttonHeight);
 }
 
 
@@ -215,8 +241,8 @@ function displayGrid() {
   stroke("#9D4C5A");
   strokeWeight(sideLength / 25); 
 
-  for (let y = 0; y < GRIDSIZE; y++) {
-    for (let x = 0; x < GRIDSIZE; x++) {
+  for (let y = 0; y < gridSize; y++) {
+    for (let x = 0; x < gridSize; x++) {
 
       //create each square "button"
       if (grid[y][x] === gridSolution[y][x]) {
@@ -241,8 +267,8 @@ function displayNumbers() {
   textAlign(CENTER, TOP);
 
   //iterate through the 2d array (grid) and draw the values on the gameboard
-  for (let y = 0; y < GRIDSIZE; y++) {
-    for (let x = 0; x < GRIDSIZE; x++) {
+  for (let y = 0; y < gridSize; y++) {
+    for (let x = 0; x < gridSize; x++) {
       if (grid[y][x] !== 0) { //the value 0 in the 2d array (grid) is the empty space on the board
         text(grid[y][x],
           x * sideLength + widthOffset + sideLength / 16,
@@ -259,8 +285,8 @@ function findEmptySpace() {
   //because the grid variable is a 2d array, we cannot use indexOf() to find the 0 value
 
   //iterate through the grid to find the 0 value; set its X and Y coordinates in the 2d array
-  for (let y = 0; y < GRIDSIZE; y++) {
-    for (let x = 0; x < GRIDSIZE; x++) {
+  for (let y = 0; y < gridSize; y++) {
+    for (let x = 0; x < gridSize; x++) {
       if (grid[y][x] === 0) {
         emptySpaceY = y;
         emptySpaceX = x;
@@ -273,8 +299,8 @@ function checkForWin() {
   let errorCounter = 0;
 
   //compare the grid (user-interacted 2d array) and gridSolution
-  for (let y = 0; y < GRIDSIZE; y++) {
-    for (let x = 0; x < GRIDSIZE; x++) {
+  for (let y = 0; y < gridSize; y++) {
+    for (let x = 0; x < gridSize; x++) {
       if (grid[y][x] !== gridSolution[y][x]) {
         errorCounter++;
       }
@@ -373,8 +399,8 @@ function drawWinScreen() {
   //change text settings
   textFont(domineBoldFont);
   stroke("#45252A");
-  textSize(sideLength);
-  strokeWeight(sideLength / 10);
+  textSize(consistentRatio);
+  strokeWeight(consistentRatio / 10);
 
   //write text
   text("YOU\nWIN!", width / 2, height / 2);
@@ -385,20 +411,20 @@ function drawHelpScreen() {
 
   //change text settings
   textFont(domineBoldFont);
-  textAlign(CENTER, CENTER);
+  textAlign(CENTER);
   fill("#45252A");
   strokeWeight(0);
-  textSize(sideLength / 6);
+  textSize(consistentRatio / 6);
 
   //write instruction text
-  text(`CONFUSED!? (Me too)
+  text(`CONFUSED!?
   
 1. Click on the squares surrounding the empty square to move\n
 2. The goal is to order the numbers from 1 to 15 with the empty space in the bottom right corner\n
 3. Click the R button to restart\n
 4. Good luck!
 
-*click on the question mark to exit`, width / 2, height / 2, sideLength * 3, sideLength * 3);
+*click on the question mark to exit`, width / 2, height / 2, sideLength * (gridSize-1), sideLength * (gridSize-1));
 }
 
 function drawWinHelpRect() {
@@ -412,5 +438,5 @@ function drawWinHelpRect() {
   fill("#EEADA6");
 
   //create background rectangle
-  rect(width / 2, height / 2, sideLength * 4, sideLength * 4, rectRoundEdge);
+  rect(width / 2, height / 2, sideLength * gridSize, sideLength * gridSize, rectRoundEdge);
 }
