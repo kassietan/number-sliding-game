@@ -13,15 +13,16 @@ For my major project, I will be expanding on my 2d arrays assignment. This game,
   - specifically, fix the "titles" (i.e. "16 SQUARES")
   - hover effect for the "buttons"
     - fill in the text when hovered
+  - make the win screen look a LOT better
 
 
 ## Nice-to-Have List
-- adding some sort of animation element to the game (jQuery)
+- adding some sort of animation element to the game (jQuery? CSS?)
 - adding an auto-solve function
 - sanity check for creating a random grid
   - there is a formula to find out if a given combination is solvable
   - in the "nice-to-have list" because the user still has the option to restart, regardless of solvability 
 
-## Might Incorporate List
+## Might-Incorporate List
 - on-screen timer (showing how much time has elapsed)
 - on-screen moves counter
