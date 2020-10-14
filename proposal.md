@@ -9,6 +9,10 @@ For my major project, I will be expanding on my 2d arrays assignment. This game,
   - this will also be applied to when the user restarts the game
 - fix the issue with the canvas size (in some instances, the gamebaord and the side buttons will overlap)
 - add a delay between solving the puzzle and having the win screen appear
+- improve the UI
+  - specifically, fix the "titles" (i.e. "16 SQUARES")
+  - hover effect for the "buttons"
+    - fill in the text when hovered
 
 ## Nice-to-Have List
 - adding some sort of animation element to the game (jQuery)
