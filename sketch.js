@@ -84,7 +84,17 @@ function draw() {
   drawBackground();
 
   if (startScreen) {
-    drawWinHelpRect();
+    drawScreenRect();
+
+    stroke("#9D4C5A");
+    fill("#9D4C5A");
+    textAlign(CENTER, CENTER);
+    textFont(domineBoldFont);
+    strokeWeight(1);
+    textSize(consistentRatio/4);
+    text("Choose a Grid Size", width/2, height/2 - consistentRatio);
+
+    drawGridSizeOptions();
   }
 
   else {
@@ -115,6 +125,20 @@ function draw() {
   }
 }
 
+
+function drawGridSizeOptions() {
+  rectMode(CENTER);
+  strokeWeight(sideLength / 25);
+  stroke("#45252A");
+  fill("#F7D0CC");
+
+  rect(width/2 - consistentRatio, height/2 + consistentRatio/2, 100, 100, rectRoundEdge);
+  text("3",width/2 - consistentRatio, height/2 + consistentRatio/2 );
+
+  rect(width/2, height/2 + consistentRatio/2, 100, 100, rectRoundEdge);
+  
+  rect(width/2 + consistentRatio, height/2 + consistentRatio/2, 100, 100, rectRoundEdge);
+}
 
 
 function createRandomGrid() {
@@ -180,13 +204,14 @@ function drawLinePattern() {
   let forwardSlash = true;
 
   //draw the line background pattern (does not scale to size of canvas; meant to serve as a consistent "wallpaper")
-  let numberOfIterations = height/20;
-  if (numberOfIterations % 2 === 1) {
-    numberOfIterations++;
+  let numberOfVerticalIterations = floor(height/20); //floor is important!!
+  //ensure that it iterates vertically an even number of times
+  if (numberOfVerticalIterations % 2 === 1) {
+    numberOfVerticalIterations++;
   } 
 
   for (let x = 0; x < width; x += 20) {
-    for (let y = 0; y < numberOfIterations; y++) {
+    for (let y = 0; y < numberOfVerticalIterations; y++) {
       if (forwardSlash === true) {
         line(x, y*20, x + 5, y*20 + 5);
       }
@@ -239,6 +264,8 @@ function drawButtonText() {
 
 
 function displayGrid() {
+  //draw grid frame
+
   //draw settings for gameboard background rectangles
   strokeWeight(0);
   rectMode(CENTER);
@@ -248,10 +275,13 @@ function displayGrid() {
   rect(width / 2, height / 2, sideLength * (gridSize * 1.1), sideLength * (gridSize * 1.1), rectRoundEdge); 
 
   //fill in the gaps from the rounded corners of the gameboard
-  fill("#9D4C5A"); //pink (same as outline of each grid)
+  fill("#9D4C5A"); //pink (same as stroke colour of each number square on the gameboard)
   rect(width / 2, height / 2, sideLength * (gridSize - 1), sideLength * (gridSize - 1), rectRoundEdge);
 
   
+
+  //draw number squares on grid
+
   //draw setting for the squares on the gameboard
   rectMode(CORNER);
   stroke("#9D4C5A");
@@ -410,7 +440,7 @@ function mousePressed() {
 
 
 function drawWinScreen() {
-  drawWinHelpRect(); //the frame/background for the text on the win screen
+  drawScreenRect(); //the frame/background for the text on the win screen
 
   //change text settings
   textFont(domineBoldFont);
@@ -423,7 +453,7 @@ function drawWinScreen() {
 }
 
 function drawHelpScreen() {
-  drawWinHelpRect(); //the frame/background for the text on the instruction screen
+  drawScreenRect(); //the frame/background for the text on the instruction screen
 
   //change text settings
   textFont(domineBoldFont);
@@ -433,7 +463,7 @@ function drawHelpScreen() {
   textSize(consistentRatio / 6);
 
   //write instruction text
-  text(`CONFUSED!?
+  text(`CONFUSED?
   
 1. Click on the squares surrounding the empty square to move\n
 2. The goal is to order the numbers from 1 to 15 with the empty space in the bottom right corner\n
@@ -443,14 +473,15 @@ function drawHelpScreen() {
 *click on the question mark to exit`, width / 2, height / 2, sideLength * (gridSize-1), sideLength * (gridSize-1));
 }
 
-function drawWinHelpRect() {
+function drawScreenRect() {
   //creates a rectangle that serves as the frame/background for the text on the win screen and instruction screen
 
   //change draw settings for rectangle
   rectMode(CENTER);
   strokeWeight(sideLength / 25); //should be ratio of width or something
 
-  stroke("#9D4C5A");
+  // stroke("#9D4C5A"); THIS WAS THE PINK
+  stroke("#45252A");
   fill("#EEADA6");
 
   //create background rectangle
