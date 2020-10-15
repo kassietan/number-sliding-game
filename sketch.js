@@ -19,6 +19,7 @@ let widthOffset, heightOffset;
 
 let emptySpaceX, emptySpaceY;
 
+let startScreen = true;
 let winState = false;
 let needHelp = false;
 
@@ -45,6 +46,10 @@ function preload() {
 function setup() {
   createCanvas(windowWidth, windowHeight);
 
+
+
+  //should turn this into a function (?)
+
   //convert grid solution (currently a string from .txt file) into a 2d array
   for (let i=0; i<gridSolution.length; i++) {
     gridSolution[i] = gridSolution[i].split(",");
@@ -56,6 +61,9 @@ function setup() {
       gridSolution[y][x] = int(gridSolution[y][x]);
     }
   }
+
+
+
 
   grid = createRandomGrid(); //create randomized 2d array for the gameboard
 
@@ -75,29 +83,35 @@ function setup() {
 function draw() {
   drawBackground();
 
-  //draw the buttons (title, restart, question)
-  drawButtonBoxes();
-  drawButtonText();
-
-  if (!winState) {
-    //create game board
-    displayGrid();
-    displayNumbers();
-
-    //find the coordinates of the empty space
-    findEmptySpace();
-
-    checkForWin();
+  if (startScreen) {
+    drawWinHelpRect();
   }
+
   else {
-    //win screen is drawn if winState is true (game is won)
-    drawWinScreen();
-  }
+    //draw the buttons (title, restart, question)
+    drawButtonBoxes();
+    drawButtonText();
+
+    if (!winState) {
+      //create game board
+      displayGrid();
+      displayNumbers();
+
+      //find the coordinates of the empty space
+      findEmptySpace();
+
+      checkForWin();
+    }
+    else {
+      //win screen is drawn if winState is true (game is won)
+      drawWinScreen();
+    }
 
 
-  if (needHelp) {
-    //boolean needHelp is triggered by clicking the questionButton
-    drawHelpScreen();
+    if (needHelp) {
+      //boolean needHelp is triggered by clicking the questionButton
+      drawHelpScreen();
+    }
   }
 }
 
@@ -157,8 +171,6 @@ function drawBackground() {
   background("#764149");
 
   drawLinePattern();
-
-  drawGameboardFrame();
 }
 
 function drawLinePattern() {
@@ -168,32 +180,23 @@ function drawLinePattern() {
   let forwardSlash = true;
 
   //draw the line background pattern (does not scale to size of canvas; meant to serve as a consistent "wallpaper")
+  let numberOfIterations = height/20;
+  if (numberOfIterations % 2 === 1) {
+    numberOfIterations++;
+  } 
+
   for (let x = 0; x < width; x += 20) {
-    for (let y = 0; y < height; y += 20) {
+    for (let y = 0; y < numberOfIterations; y++) {
       if (forwardSlash === true) {
-        line(x, y, x + 5, y + 5);
+        line(x, y*20, x + 5, y*20 + 5);
       }
       else {
-        line(x + 5, y, x, y + 5);
+        line(x + 5, y*20, x, y*20 + 5);
       }
       forwardSlash = !forwardSlash;
     }
     forwardSlash = !forwardSlash;
   }
-}
-
-function drawGameboardFrame() {
-  //draw settings for gameboard background rectangles
-  strokeWeight(0);
-  rectMode(CENTER);
-
-  //rectangular gameboard frame 
-  fill("#45252A");
-  rect(width / 2, height / 2, sideLength * (gridSize * 1.1), sideLength * (gridSize * 1.1), rectRoundEdge); 
-
-  //fill in the gaps from the rounded corners of the gameboard
-  fill("#9D4C5A");
-  rect(width / 2, height / 2, sideLength * (gridSize - 1), sideLength * (gridSize - 1), rectRoundEdge);
 }
 
 
@@ -228,7 +231,7 @@ function drawButtonText() {
   text("R", width - buttonWidth / 2, height - buttonTopBottomOffset - buttonHeight / 2 - buttonGap / 2);
 
   //title text
-  text(" 16", 0, buttonTopBottomOffset - buttonGap / 2, buttonWidth, buttonHeight);
+  text(" " + gridSize*gridSize, 0, buttonTopBottomOffset - buttonGap / 2, buttonWidth, buttonHeight);
   textSize(sideLength / 6); //"TILES" must be written smaller in order to "fit" in the button
   text("TIL\nES !", 0, buttonTopBottomOffset + buttonHeight + buttonGap / 2, buttonWidth, buttonHeight);
 }
@@ -236,6 +239,19 @@ function drawButtonText() {
 
 
 function displayGrid() {
+  //draw settings for gameboard background rectangles
+  strokeWeight(0);
+  rectMode(CENTER);
+
+  //rectangular gameboard frame 
+  fill("#45252A"); //dark burgundy 
+  rect(width / 2, height / 2, sideLength * (gridSize * 1.1), sideLength * (gridSize * 1.1), rectRoundEdge); 
+
+  //fill in the gaps from the rounded corners of the gameboard
+  fill("#9D4C5A"); //pink (same as outline of each grid)
+  rect(width / 2, height / 2, sideLength * (gridSize - 1), sideLength * (gridSize - 1), rectRoundEdge);
+
+  
   //draw setting for the squares on the gameboard
   rectMode(CORNER);
   stroke("#9D4C5A");
