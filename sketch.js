@@ -6,7 +6,7 @@
 // - I spent a lot of time working on the visual design of the code
 // - my efforts were spent on the UI
 // - I (might) continue working on this for my major project by creating some sort of auto-solve function (this is, of course, subject to change)
-// test comment
+// 
 
 let gridSize = 3;
 let grid;
@@ -29,6 +29,10 @@ let buttonGap, buttonHeight, buttonWidth, buttonTopBottomOffset;
 let montserratSemiBoldFont, domineBoldFont;
 
 
+
+let someButton;
+
+
 function preload() {
   //load the fonts
   montserratSemiBoldFont = loadFont("assets/Montserrat-SemiBold.ttf");
@@ -44,8 +48,8 @@ function preload() {
 }
 
 function setup() {
-  createCanvas(windowWidth, windowHeight);
-
+  //createCanvas(windowWidth, windowHeight);
+  createCanvas(1200, 675); //"ideal" 16:9 aspect ratio
 
 
   //should turn this into a function (?)
@@ -78,6 +82,16 @@ function setup() {
 
   //determining dimensions of the "buttons" (title, restart, question buttons)
   findButtonDimensions();
+
+
+
+  someButton = createButton("3");
+  someButton.position(width/2, height/2);
+  someButton.class("button");
+  someButton.size(buttonWidth, buttonHeight);
+  someButton.attribute("align","right")
+
+
 }
 
 function draw() {
@@ -94,7 +108,7 @@ function draw() {
     textSize(consistentRatio/4);
     text("Choose a Grid Size", width/2, height/2 - consistentRatio);
 
-    drawGridSizeOptions();
+    drawGridSizeButtons();
   }
 
   else {
@@ -125,20 +139,39 @@ function draw() {
   }
 }
 
+function drawScreenRect() {
+  //creates a rectangle that serves as the frame/background for the text on the win screen and instruction screen
 
-function drawGridSizeOptions() {
+  //change draw settings for rectangle
   rectMode(CENTER);
-  strokeWeight(sideLength / 25);
+  strokeWeight(sideLength / 25); //should be ratio of width or something
+
+  // stroke("#9D4C5A"); THIS WAS THE PINK
+  stroke("#45252A");
+  fill("#EEADA6");
+
+  //create background rectangle
+  rect(width / 2, height / 2, sideLength * gridSize, sideLength * gridSize, rectRoundEdge);
+}
+
+function drawGridSizeButtons() {
+  rectMode(CENTER);
+  strokeWeight(sideLength / 40);
   stroke("#45252A");
   fill("#F7D0CC");
+  textSize(consistentRatio/2.5);
 
   rect(width/2 - consistentRatio, height/2 + consistentRatio/2, 100, 100, rectRoundEdge);
   text("3",width/2 - consistentRatio, height/2 + consistentRatio/2 );
 
   rect(width/2, height/2 + consistentRatio/2, 100, 100, rectRoundEdge);
+  text("4",width/2, height/2 + consistentRatio/2 );
   
   rect(width/2 + consistentRatio, height/2 + consistentRatio/2, 100, 100, rectRoundEdge);
+  text("5",width/2 + consistentRatio, height/2 + consistentRatio/2 );
 }
+
+
 
 
 function createRandomGrid() {
@@ -473,17 +506,3 @@ function drawHelpScreen() {
 *click on the question mark to exit`, width / 2, height / 2, sideLength * (gridSize-1), sideLength * (gridSize-1));
 }
 
-function drawScreenRect() {
-  //creates a rectangle that serves as the frame/background for the text on the win screen and instruction screen
-
-  //change draw settings for rectangle
-  rectMode(CENTER);
-  strokeWeight(sideLength / 25); //should be ratio of width or something
-
-  // stroke("#9D4C5A"); THIS WAS THE PINK
-  stroke("#45252A");
-  fill("#EEADA6");
-
-  //create background rectangle
-  rect(width / 2, height / 2, sideLength * gridSize, sideLength * gridSize, rectRoundEdge);
-}

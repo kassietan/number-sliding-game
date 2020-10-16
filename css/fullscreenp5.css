@@ -8,3 +8,22 @@ body, html {
     display: none;
 }
  
+.button {
+    background-color: #F7D0CC;
+    border-color: black;
+    border: 5px;
+    color: white;
+    text-align: center;
+    cursor: pointer;
+    font-family: 'Courier New', Courier, monospace;
+    border: 2px solid #4CAF50; /* Green */
+    border-radius: 8px;
+    opacity: 1;
+    transition: 0.3s;
+}
+
+.button:hover {background-color: #EEADA6}
+
+/* How to use Javascript variables in CSS? */
+/* https://stackoverflow.com/questions/49402471/how-to-use-javascript-variables-in-css */
+ 
