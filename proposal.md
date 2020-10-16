@@ -14,6 +14,7 @@ For my major project, I will be expanding on my 2d arrays assignment. This game,
   - hover effect for the "buttons"
     - fill in the text when hovered
   - make the win screen look a LOT better
+  - fix the colour scheme
 
 
 ## Nice-to-Have List
