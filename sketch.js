@@ -10,7 +10,7 @@
 
 let gridSize = 3;
 let grid;
-let gridSolution;
+let gridSolution = [];
 
 let sideLength;
 let rectRoundEdge;
@@ -30,7 +30,7 @@ let montserratSemiBoldFont, domineBoldFont;
 
 
 
-let someButton;
+let buttonGridSize3, buttonGridSize4, buttonGridSize5;
 
 
 function preload() {
@@ -38,36 +38,15 @@ function preload() {
   montserratSemiBoldFont = loadFont("assets/Montserrat-SemiBold.ttf");
   domineBoldFont = loadFont("assets/Domine-Bold.ttf");
 
-  //load the grid solution (based on the gridSize)
-  if (gridSize === 4) {
-    gridSolution = loadStrings("assets/solution-4.txt");
-  }
-  else if (gridSize === 3) {
-    gridSolution = loadStrings("assets/solution-3.txt");
-  }
+  solutionGridSize3 = loadStrings("assets/solution-3.txt");
+  solutionGridSize4 = loadStrings("assets/solution-4.txt");
+  solutionGridSize5 = loadStrings("assets/solution-5.txt");
+
 }
 
 function setup() {
   //createCanvas(windowWidth, windowHeight);
   createCanvas(1200, 675); //"ideal" 16:9 aspect ratio
-
-
-  //should turn this into a function (?)
-
-  //convert grid solution (currently a string from .txt file) into a 2d array
-  for (let i=0; i<gridSolution.length; i++) {
-    gridSolution[i] = gridSolution[i].split(",");
-  }
-
-  //loop through the gridSolution and turn the strings into numbers
-  for (let y=0; y<gridSize; y++) {
-    for (let x=0; x<gridSize; x++) {
-      gridSolution[y][x] = int(gridSolution[y][x]);
-    }
-  }
-
-
-
 
   grid = createRandomGrid(); //create randomized 2d array for the gameboard
 
@@ -84,12 +63,11 @@ function setup() {
   findButtonDimensions();
 
 
+  buttonGridSize3 = createButton("3");
 
-  someButton = createButton("3");
-  someButton.position(width/2, height/2);
-  someButton.class("button");
-  someButton.size(buttonWidth, buttonHeight);
-  someButton.attribute("align","right")
+  buttonGridSize4 = createButton("4");
+
+  buttonGridSize5 = createButton("5");
 
 
 }
@@ -100,15 +78,7 @@ function draw() {
   if (startScreen) {
     drawScreenRect();
 
-    stroke("#9D4C5A");
-    fill("#9D4C5A");
-    textAlign(CENTER, CENTER);
-    textFont(domineBoldFont);
-    strokeWeight(1);
-    textSize(consistentRatio/4);
-    text("Choose a Grid Size", width/2, height/2 - consistentRatio);
-
-    drawGridSizeButtons();
+    drawGridSizeChooser();
   }
 
   else {
@@ -139,7 +109,54 @@ function draw() {
   }
 }
 
-function drawScreenRect() {
+function drawGridSizeChooser() {
+  stroke("#45252A");
+  fill("#45252A");
+  textAlign(CENTER, CENTER);
+  textFont(domineBoldFont);
+  strokeWeight(1);
+  textSize(consistentRatio/4);
+  text("Choose a Grid Size", width/2, height/2 - consistentRatio);
+
+  buttonGridSize3.position(width/2 - buttonWidth*2, height/2);
+  buttonGridSize3.class("button");
+  buttonGridSize3.size(buttonWidth, buttonHeight);
+  buttonGridSize3.attribute("align","right")
+  buttonGridSize3.mousePressed(startGameGridSize3); //hhhhhhhhhhhhh
+
+  buttonGridSize4.position(width/2 - buttonWidth*0.5, height/2);
+  buttonGridSize4.class("button");
+  buttonGridSize4.size(buttonWidth, buttonHeight);
+  buttonGridSize4.attribute("align","right");
+
+  buttonGridSize5.position(width/2 + buttonWidth, height/2);
+  buttonGridSize5.class("button");
+  buttonGridSize5.size(buttonWidth, buttonHeight);
+  buttonGridSize5.attribute("align","right");
+
+
+}
+
+
+function turnStringIntoGridSolution(stringFile) {
+    //should turn this into a function (?)
+
+  //convert grid solution (currently a string from .txt file) into a 2d array
+  for (let i=0; i<stringFile.length; i++) {
+    stringFile[i] = stringFile[i].split(",");
+  }
+
+  //loop through the gridSolution and turn the strings into numbers
+  for (let y=0; y<gridSize; y++) {
+    gridSolution.push([]);
+    for (let x=0; x<gridSize; x++) {
+      gridSolution[y][x] = int(stringFile[y][x]);
+    }
+  }
+
+}
+
+function drawScreenRect() { //should i change the name to drawBackgroundRect
   //creates a rectangle that serves as the frame/background for the text on the win screen and instruction screen
 
   //change draw settings for rectangle
@@ -148,30 +165,26 @@ function drawScreenRect() {
 
   // stroke("#9D4C5A"); THIS WAS THE PINK
   stroke("#45252A");
-  fill("#EEADA6");
+  fill("#EBBDBC"); 
 
   //create background rectangle
   rect(width / 2, height / 2, sideLength * gridSize, sideLength * gridSize, rectRoundEdge);
 }
 
-function drawGridSizeButtons() {
-  rectMode(CENTER);
-  strokeWeight(sideLength / 40);
-  stroke("#45252A");
-  fill("#F7D0CC");
-  textSize(consistentRatio/2.5);
 
-  rect(width/2 - consistentRatio, height/2 + consistentRatio/2, 100, 100, rectRoundEdge);
-  text("3",width/2 - consistentRatio, height/2 + consistentRatio/2 );
-
-  rect(width/2, height/2 + consistentRatio/2, 100, 100, rectRoundEdge);
-  text("4",width/2, height/2 + consistentRatio/2 );
+function startGameGridSize3() {
+  startScreen = false;
   
-  rect(width/2 + consistentRatio, height/2 + consistentRatio/2, 100, 100, rectRoundEdge);
-  text("5",width/2 + consistentRatio, height/2 + consistentRatio/2 );
+  hideGridSizeButtons();
+
+  turnStringIntoGridSolution(solutionGridSize3);
 }
 
-
+function hideGridSizeButtons() {
+  buttonGridSize3.hide();  
+  buttonGridSize4.hide();
+  buttonGridSize5.hide();
+}
 
 
 function createRandomGrid() {
@@ -225,7 +238,8 @@ function findButtonDimensions() {
 
 
 function drawBackground() {
-  background("#764149");
+  background("#7A3E48");
+  //764145
 
   drawLinePattern();
 }
@@ -266,14 +280,15 @@ function drawButtonBoxes() {
   stroke("#45252A");
   fill("#45252A");
 
-  //draw title boxes
-  rect(0, buttonTopBottomOffset, buttonWidth, buttonHeight, 0, rectRoundEdge, rectRoundEdge, 0);
-  rect(0, buttonTopBottomOffset + buttonHeight + buttonGap, buttonWidth, buttonHeight, 0, rectRoundEdge, rectRoundEdge, 0);
-
   //restart button
   rect(width - buttonWidth, height - buttonTopBottomOffset - buttonHeight, buttonWidth, buttonHeight, rectRoundEdge, 0, 0, rectRoundEdge);
   //upper question button
   rect(width - buttonWidth, height - buttonTopBottomOffset - buttonHeight - buttonHeight - buttonGap, buttonWidth, buttonHeight, rectRoundEdge, 0, 0, rectRoundEdge);
+
+  //draw title boxes
+  rect(0, buttonTopBottomOffset, buttonWidth, buttonHeight, 0, rectRoundEdge, rectRoundEdge, 0);
+  rect(0, buttonTopBottomOffset + buttonHeight + buttonGap, buttonWidth, buttonHeight, 0, rectRoundEdge, rectRoundEdge, 0);
+
 }
 
 function drawButtonText() {
@@ -281,7 +296,7 @@ function drawButtonText() {
   textFont(domineBoldFont);
   textSize(sideLength / 3);
   strokeWeight(sideLength / 45);
-  stroke("#F7D0CC");
+  stroke("#FBDFDF");
   textAlign(CENTER, CENTER);
 
   //text for question and restart buttons
@@ -289,9 +304,9 @@ function drawButtonText() {
   text("R", width - buttonWidth / 2, height - buttonTopBottomOffset - buttonHeight / 2 - buttonGap / 2);
 
   //title text
-  text(" " + gridSize*gridSize, 0, buttonTopBottomOffset - buttonGap / 2, buttonWidth, buttonHeight);
-  textSize(sideLength / 6); //"TILES" must be written smaller in order to "fit" in the button
-  text("TIL\nES !", 0, buttonTopBottomOffset + buttonHeight + buttonGap / 2, buttonWidth, buttonHeight);
+  text(" " + gridSize, 0, buttonTopBottomOffset - buttonGap / 2, buttonWidth, buttonHeight);
+  //textSize(sideLength / 6); //"TILES" must be written smaller in order to "fit" in the button
+  text(" ^2", 0, buttonTopBottomOffset + buttonHeight + buttonGap / 2, buttonWidth, buttonHeight);
 }
 
 
@@ -325,10 +340,10 @@ function displayGrid() {
 
       //create each square "button"
       if (grid[y][x] === gridSolution[y][x]) {
-        fill("#EEADA6"); //deep pink if correct
+        fill("#EBBDBC"); //deep pink if correct
       }
       else {
-        fill("#F7D0CC"); //light pink if incorrect
+        fill("#FBDFDF"); //light pink if incorrect
       }
       rect(x * sideLength + widthOffset, y * sideLength + heightOffset, sideLength, sideLength, rectRoundEdge);
 
@@ -499,7 +514,7 @@ function drawHelpScreen() {
   text(`CONFUSED?
   
 1. Click on the squares surrounding the empty square to move\n
-2. The goal is to order the numbers from 1 to 15 with the empty space in the bottom right corner\n
+2. The goal is to order the numbers from 1 to ${gridSize*gridSize - 1} with the empty space in the bottom right corner\n
 3. Click the R button to restart\n
 4. Good luck!
 

@@ -9,21 +9,31 @@ body, html {
 }
  
 .button {
-    background-color: #F7D0CC;
-    border-color: black;
-    border: 5px;
-    color: white;
+    background-color: #FBDFDF;
+    border: 5px solid #45252A;
+
+    color: #45252A;
+    font-family: 'Domine', serif;
+    font-size: 40px;
     text-align: center;
+
     cursor: pointer;
-    font-family: 'Courier New', Courier, monospace;
-    border: 2px solid #4CAF50; /* Green */
+
+    
     border-radius: 8px;
     opacity: 1;
-    transition: 0.3s;
+    transition: 0.4s;
 }
 
-.button:hover {background-color: #EEADA6}
+.button:hover {
+    background-color: #9D4C5A;
+    color: #FBDFDF;
+}
 
 /* How to use Javascript variables in CSS? */
 /* https://stackoverflow.com/questions/49402471/how-to-use-javascript-variables-in-css */
  
+/* fade in effect for button hover */
+/* https://www.w3schools.com/css/tryit.asp?filename=trycss_buttons_fade */
+
+/* font-family: 'Montserrat', sans-serif; */
