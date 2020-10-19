@@ -11,8 +11,7 @@ For my major project, I will be expanding on my 2d arrays assignment. This game,
 - add a delay between solving the puzzle and having the win screen appear
 - improve the UI
   - specifically, fix the "titles" (i.e. "16 SQUARES")
-  - hover effect for the "buttons"
-    - fill in the text when hovered
+  - hover effect for the "buttons" perhaps
   - make the win screen look a LOT better
   - fix the colour scheme
 
