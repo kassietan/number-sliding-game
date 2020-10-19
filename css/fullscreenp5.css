@@ -8,7 +8,7 @@ body, html {
     display: none;
 }
  
-.button {
+.gridSizeButton {
     background-color: #FBDFDF;
     border: 5px solid #45252A;
 
@@ -25,10 +25,12 @@ body, html {
     transition: 0.4s;
 }
 
-.button:hover {
+.gridSizeButton:hover {
     background-color: #9D4C5A;
     color: #FBDFDF;
 }
+
+
 
 /* How to use Javascript variables in CSS? */
 /* https://stackoverflow.com/questions/49402471/how-to-use-javascript-variables-in-css */

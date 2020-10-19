@@ -8,9 +8,11 @@
 // - I (might) continue working on this for my major project by creating some sort of auto-solve function (this is, of course, subject to change)
 // 
 
-let gridSize = 3;
+let gridSize;
 let grid;
 let gridSolution = [];
+
+let solutionGridSize3, solutionGridSize4, solutionGridSize5;
 
 let sideLength;
 let rectRoundEdge;
@@ -22,6 +24,7 @@ let emptySpaceX, emptySpaceY;
 let startScreen = true;
 let winState = false;
 let needHelp = false;
+let playGame = true; //determines if the user can interact with the gameboard to make moves
 
 let consistentRatio; //the ratio that doesn't change, no matter the gridSize or gridLength
 let buttonGap, buttonHeight, buttonWidth, buttonTopBottomOffset;
@@ -42,34 +45,28 @@ function preload() {
   solutionGridSize4 = loadStrings("assets/solution-4.txt");
   solutionGridSize5 = loadStrings("assets/solution-5.txt");
 
+  buttonGridSize3 = createButton("3");
+  buttonGridSize4 = createButton("4");
+  buttonGridSize5 = createButton("5");
+
 }
 
 function setup() {
   //createCanvas(windowWidth, windowHeight);
   createCanvas(1200, 675); //"ideal" 16:9 aspect ratio
 
-  grid = createRandomGrid(); //create randomized 2d array for the gameboard
+  //determine consistentRatio; number that is used to draw everything and is NOT dependant on the gridSize or gridLength
+  if (height <= width) {
+    consistentRatio = height/5.5; 
+  }
+  else {
+    consistentRatio = width/5.5;
+  }
 
-
-  findSideLength(); //side length of the square tiles
-
-  rectRoundEdge = sideLength / 10; //how rounded the edges are
-
-  //find the offset values to centre the grid in the middle of the canvas
-  widthOffset = width/2 - sideLength*(gridSize/2);
-  heightOffset = height/2 - sideLength*(gridSize/2);
+  rectRoundEdge = consistentRatio / 10; //how rounded the edges are
 
   //determining dimensions of the "buttons" (title, restart, question buttons)
   findButtonDimensions();
-
-
-  buttonGridSize3 = createButton("3");
-
-  buttonGridSize4 = createButton("4");
-
-  buttonGridSize5 = createButton("5");
-
-
 }
 
 function draw() {
@@ -109,6 +106,34 @@ function draw() {
   }
 }
 
+
+
+function findButtonDimensions() {
+  buttonGap = consistentRatio / 10; //gap between buttons beside each other
+  buttonHeight = consistentRatio / 1.75; //height of each button
+  buttonWidth = consistentRatio / 1.5; //width of each button
+  buttonTopBottomOffset = consistentRatio; //the distance between the button and the top/bottom (which ever is closest) 
+}
+
+
+
+
+function drawScreenRect() { //should i change the name to drawBackgroundRect
+  //creates a rectangle that serves as the frame/background for the text on the win screen and instruction screen
+
+  //change draw settings for rectangle
+  rectMode(CENTER);
+  strokeWeight(consistentRatio / 18); //should be ratio of width or something
+
+  // stroke("#9D4C5A"); THIS WAS THE PINK
+  stroke("#45252A");
+  fill("#EBBDBC"); 
+
+  //create background rectangle
+  rect(width / 2, height / 2, consistentRatio * 4, consistentRatio * 4, rectRoundEdge);
+}
+
+
 function drawGridSizeChooser() {
   stroke("#45252A");
   fill("#45252A");
@@ -119,27 +144,29 @@ function drawGridSizeChooser() {
   text("Choose a Grid Size", width/2, height/2 - consistentRatio);
 
   buttonGridSize3.position(width/2 - buttonWidth*2, height/2);
-  buttonGridSize3.class("button");
-  buttonGridSize3.size(buttonWidth, buttonHeight);
-  buttonGridSize3.attribute("align","right")
-  buttonGridSize3.mousePressed(startGameGridSize3); //hhhhhhhhhhhhh
+  buttonGridSize3.class("gridSizeButton");
+  buttonGridSize3.size(buttonWidth, buttonWidth);
+  // buttonGridSize3.attribute("align","right");     literally does not do anything?!?!?! why did i add this oof
+  buttonGridSize3.mouseClicked(startGameGridSize3); //hhhhhhhhhhhhh
 
   buttonGridSize4.position(width/2 - buttonWidth*0.5, height/2);
-  buttonGridSize4.class("button");
-  buttonGridSize4.size(buttonWidth, buttonHeight);
-  buttonGridSize4.attribute("align","right");
+  buttonGridSize4.class("gridSizeButton");
+  buttonGridSize4.size(buttonWidth, buttonWidth);
+  // buttonGridSize4.attribute("align","right");
+  buttonGridSize4.mouseClicked(startGameGridSize4);
 
   buttonGridSize5.position(width/2 + buttonWidth, height/2);
-  buttonGridSize5.class("button");
-  buttonGridSize5.size(buttonWidth, buttonHeight);
-  buttonGridSize5.attribute("align","right");
+  buttonGridSize5.class("gridSizeButton");
+  buttonGridSize5.size(buttonWidth, buttonWidth);
+  // buttonGridSize5.attribute("align","right");
+  buttonGridSize5.mouseClicked(startGameGridSize5);
 
 
 }
 
 
 function turnStringIntoGridSolution(stringFile) {
-    //should turn this into a function (?)
+  let gridSolution = [];
 
   //convert grid solution (currently a string from .txt file) into a 2d array
   for (let i=0; i<stringFile.length; i++) {
@@ -154,31 +181,77 @@ function turnStringIntoGridSolution(stringFile) {
     }
   }
 
+  return gridSolution;
+
 }
 
-function drawScreenRect() { //should i change the name to drawBackgroundRect
-  //creates a rectangle that serves as the frame/background for the text on the win screen and instruction screen
-
-  //change draw settings for rectangle
-  rectMode(CENTER);
-  strokeWeight(sideLength / 25); //should be ratio of width or something
-
-  // stroke("#9D4C5A"); THIS WAS THE PINK
-  stroke("#45252A");
-  fill("#EBBDBC"); 
-
-  //create background rectangle
-  rect(width / 2, height / 2, sideLength * gridSize, sideLength * gridSize, rectRoundEdge);
-}
 
 
 function startGameGridSize3() {
-  startScreen = false;
-  
+  gridSize = 3;
+  gridSolution = turnStringIntoGridSolution(solutionGridSize3);
+  grid = createRandomGrid(); //create randomized 2d array for the gameboard
+  grid = [ [1,2,3],[4,5,6],[7,0,8]];
+
+  findSideLength(); //side length of the square tiles
+  findOffset();
+
   hideGridSizeButtons();
 
-  turnStringIntoGridSolution(solutionGridSize3);
+  startScreen = false;
+
 }
+
+function startGameGridSize4() {
+  gridSize = 4;
+  gridSolution = turnStringIntoGridSolution(solutionGridSize4);
+  grid = createRandomGrid(); //create randomized 2d array for the gameboard
+
+
+  findSideLength(); //side length of the square tiles
+  findOffset();
+
+  hideGridSizeButtons();
+
+  startScreen = false;
+}
+
+function startGameGridSize5() {
+  gridSize = 5;
+  gridSolution = turnStringIntoGridSolution(solutionGridSize5);
+  grid = createRandomGrid(); //create randomized 2d array for the gameboard
+
+
+  findSideLength(); //side length of the square tiles
+  findOffset();
+
+  hideGridSizeButtons();
+
+  startScreen = false;
+}
+
+
+
+
+function findSideLength() {
+  //find the side length of the squares based on the dimensions of the canvas and gridSize
+
+  if (height <= width) {
+    sideLength = height/5.5 * 4 / gridSize; //original sideLength = (height / 5.5); i want the same total width (hence *4) but for the respective gridSize (hence /gridSize)
+  }
+  else {
+    sideLength = width/5.5 * 4 / gridSize;
+  }
+}
+
+function findOffset() {
+  //find the offset values to centre the grid in the middle of the canvas
+  widthOffset = width/2 - sideLength*(gridSize/2);
+  heightOffset = height/2 - sideLength*(gridSize/2);
+}
+
+
+
 
 function hideGridSizeButtons() {
   buttonGridSize3.hide();  
@@ -213,27 +286,6 @@ function createRandomGrid() {
   return randomGrid;
 }
 
-
-
-function findSideLength() {
-  //find the side length of the squares based on the dimensions of the canvas and gridSize
-
-  if (height <= width) {
-    sideLength = height/5.5 * 4 / gridSize; //original sideLength = (height / 5.5); i want the same total width (hence *4) but for the respective gridSize (hence /gridSize)
-    consistentRatio = height/5.5; //the ratio that doesn't change, no matter the gridSize or gridLength
-  }
-  else {
-    sideLength = width/5.5 * 4 / gridSize;
-    consistentRatio = width/5.5; //the ratio that doesn't change, no matter the gridSize or gridLength
-  }
-}
-
-function findButtonDimensions() {
-  buttonGap = sideLength / 15.5; //gap between buttons beside each other
-  buttonHeight = sideLength / 2; //height of each button
-  buttonWidth = sideLength / 1.75; //width of each button
-  buttonTopBottomOffset = buttonHeight * 1.25; //the distance between the button and the top/bottom (which ever is closest) 
-}
 
 
 
@@ -294,8 +346,8 @@ function drawButtonBoxes() {
 function drawButtonText() {
   //text settings 
   textFont(domineBoldFont);
-  textSize(sideLength / 3);
-  strokeWeight(sideLength / 45);
+  textSize(consistentRatio /2.5);
+  strokeWeight(consistentRatio / 45);
   stroke("#FBDFDF");
   textAlign(CENTER, CENTER);
 
@@ -312,7 +364,7 @@ function drawButtonText() {
 
 
 function displayGrid() {
-  //draw grid frame
+  //draw gameboard frame and background
 
   //draw settings for gameboard background rectangles
   strokeWeight(0);
@@ -326,19 +378,20 @@ function displayGrid() {
   fill("#9D4C5A"); //pink (same as stroke colour of each number square on the gameboard)
   rect(width / 2, height / 2, sideLength * (gridSize - 1), sideLength * (gridSize - 1), rectRoundEdge);
 
-  
-
-  //draw number squares on grid
+  //draw squares (for the numbers) on grid
 
   //draw setting for the squares on the gameboard
   rectMode(CORNER);
   stroke("#9D4C5A");
-  strokeWeight(sideLength / 25); 
+  strokeWeight(consistentRatio / 25); 
 
   for (let y = 0; y < gridSize; y++) {
     for (let x = 0; x < gridSize; x++) {
+      // fill("black");
+      // rect(x*sideLength, y*sideLength, sideLength, sideLength);
+      // rect(x * sideLength + widthOffset, y * sideLength + heightOffset, sideLength, sideLength, rectRoundEdge);
 
-      //create each square "button"
+      // create each square "button"
       if (grid[y][x] === gridSolution[y][x]) {
         fill("#EBBDBC"); //deep pink if correct
       }
@@ -402,7 +455,11 @@ function checkForWin() {
   }
 
   if (errorCounter === 0) { //if there are no errors (grid matches gridSolution), then the game is solved
-    winState = true;
+    playGame = false; //to account for the "wait" time
+
+    setTimeout(() => {  
+      winState = true; 
+    }, 350);
   }
 }
 
@@ -411,7 +468,7 @@ function checkForWin() {
 function mousePressed() {
 
   //when the game is not won yet, user can make moves by clicking squares by the empty space
-  if (winState === false) {
+  if (winState === false && playGame === true) {
 
     //RIGHT square is clicked/moved
     if (mouseX >= (emptySpaceX+1)*sideLength + widthOffset && mouseX <= (emptySpaceX+2)*sideLength + widthOffset &&
@@ -474,6 +531,8 @@ function mousePressed() {
     if (winState) {
       winState = false;
     }
+
+    playGame = true;
   }
 
   //question button
@@ -505,7 +564,7 @@ function drawHelpScreen() {
 
   //change text settings
   textFont(domineBoldFont);
-  textAlign(CENTER);
+  textAlign(CENTER, CENTER);
   fill("#45252A");
   strokeWeight(0);
   textSize(consistentRatio / 6);
@@ -518,6 +577,6 @@ function drawHelpScreen() {
 3. Click the R button to restart\n
 4. Good luck!
 
-*click on the question mark to exit`, width / 2, height / 2, sideLength * (gridSize-1), sideLength * (gridSize-1));
+*click on the question mark to exit`, width / 2, height / 2, sideLength * (gridSize-0.5), sideLength * (gridSize-0.5));
 }
 
