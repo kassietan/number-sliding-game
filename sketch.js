@@ -143,23 +143,23 @@ function drawGridSizeChooser() {
   textSize(consistentRatio/4);
   text("Choose a Grid Size", width/2, height/2 - consistentRatio);
 
+  let arrayOfButtons = [buttonGridSize3, buttonGridSize4, buttonGridSize5];
+
+  for (let item of arrayOfButtons) {
+    //item.position(width/2 - buttonWidth*2, height/2);
+    item.class("gridSizeButton");
+    item.size(buttonWidth, buttonWidth);
+    item.attribute("align","right");
+  }
+
   buttonGridSize3.position(width/2 - buttonWidth*2, height/2);
-  buttonGridSize3.class("gridSizeButton");
-  buttonGridSize3.size(buttonWidth, buttonWidth);
-  // buttonGridSize3.attribute("align","right");     literally does not do anything?!?!?! why did i add this oof
-  buttonGridSize3.mouseClicked(startGameGridSize3); //hhhhhhhhhhhhh
+  buttonGridSize3.mousePressed(startGameGridSize3); //hhhhhhhhhhhhh
 
   buttonGridSize4.position(width/2 - buttonWidth*0.5, height/2);
-  buttonGridSize4.class("gridSizeButton");
-  buttonGridSize4.size(buttonWidth, buttonWidth);
-  // buttonGridSize4.attribute("align","right");
-  buttonGridSize4.mouseClicked(startGameGridSize4);
+  buttonGridSize4.mousePressed(startGameGridSize4);
 
   buttonGridSize5.position(width/2 + buttonWidth, height/2);
-  buttonGridSize5.class("gridSizeButton");
-  buttonGridSize5.size(buttonWidth, buttonWidth);
-  // buttonGridSize5.attribute("align","right");
-  buttonGridSize5.mouseClicked(startGameGridSize5);
+  buttonGridSize5.mousePressed(startGameGridSize5);
 
 
 }
@@ -188,10 +188,19 @@ function turnStringIntoGridSolution(stringFile) {
 
 
 function startGameGridSize3() {
+  let isSolvable = false; //determines whether or not the randomized game board (2d array) is solvable
+
   gridSize = 3;
   gridSolution = turnStringIntoGridSolution(solutionGridSize3);
-  grid = createRandomGrid(); //create randomized 2d array for the gameboard
-  grid = [ [1,2,3],[4,5,6],[7,0,8]];
+
+  while (isSolvable === false) {
+    grid = createRandomGrid(); //create randomized 2d array for the gameboard
+    //grid = [ [1,2,3],[4,5,6],[7,0,8]];  
+    findEmptySpace();
+    
+    isSolvable = isGridSolvable();
+    //console.log(isSolvable);
+  }
 
   findSideLength(); //side length of the square tiles
   findOffset();
@@ -203,10 +212,19 @@ function startGameGridSize3() {
 }
 
 function startGameGridSize4() {
+  let isSolvable = false; //determines whether or not the randomized game board (2d array) is solvable
+
   gridSize = 4;
   gridSolution = turnStringIntoGridSolution(solutionGridSize4);
-  grid = createRandomGrid(); //create randomized 2d array for the gameboard
 
+  while (isSolvable === false) {
+    grid = createRandomGrid(); //create randomized 2d array for the gameboard
+    findEmptySpace();
+
+    //sanity check for solvability (requires x/y values of empty space)
+    isSolvable = isGridSolvable();
+    //console.log(isSolvable);
+  }
 
   findSideLength(); //side length of the square tiles
   findOffset();
@@ -217,10 +235,19 @@ function startGameGridSize4() {
 }
 
 function startGameGridSize5() {
+  let isSolvable = false; //determines whether or not the randomized game board (2d array) is solvable
+
   gridSize = 5;
   gridSolution = turnStringIntoGridSolution(solutionGridSize5);
-  grid = createRandomGrid(); //create randomized 2d array for the gameboard
 
+  while (isSolvable === false) {
+    grid = createRandomGrid(); //create randomized 2d array for the gameboard
+    findEmptySpace();
+
+    //sanity check for solvability (requires x/y values of empty space)
+    isSolvable = isGridSolvable();
+    //console.log(isSolvable);
+  }
 
   findSideLength(); //side length of the square tiles
   findOffset();
@@ -260,6 +287,8 @@ function hideGridSizeButtons() {
 }
 
 
+
+
 function createRandomGrid() {
   let listOfNumbers = []; 
   let randomGrid = [];
@@ -285,6 +314,60 @@ function createRandomGrid() {
 
   return randomGrid;
 }
+
+function countNumberOfInversions(some2dArray) {
+  let counter = 0; //variable to count the number of inversions
+  let some1dArray = [];
+
+  //turn the 2d array into a 1d array
+  for (let y=0; y<gridSize; y++) {
+    for (let x=0; x<gridSize; x++) {
+      some1dArray.push(some2dArray[y][x]);
+    }
+  }
+  
+  for (let i=0; i<some1dArray.length; i++) {
+    //check all values after some1dArray[i] to see if they are less than some1dArray[i] (that would be 1 inversion)
+    for (let j = i; j<some1dArray.length; j++) {
+
+      if (some1dArray[i] > some1dArray[j] && // if some1dArray[j] less than some1dArray[i], this is an inversion
+        some1dArray[i] !== 0 && some1dArray[j] !== 0) {  //if one of the numbers is 0 (the blank space), it would not count as an inversion
+        counter++;
+      }
+    }
+  }
+  
+  //console.log(counter);
+  return counter;
+}
+
+function isGridSolvable() {
+
+  if (gridSize % 2 === 1) { //gridSize is 3 or 5
+    if (countNumberOfInversions(grid) % 2 === 0) { //number of inversions is even
+      return true; //yes it is solvable
+    }
+  }
+
+  else {  //gridSize is 4
+    if (emptySpaceY+1 % 2 === 1) { //if the empty space is on an ODD NUMBERED ROW (where the first row is 1)
+      if (countNumberOfInversions(grid) % 2 === 1) { //number of inversions is odd
+        return true;
+      }
+    }
+
+    else { //the empty space is on an EVEN NUMBERED ROW
+      if (countNumberOfInversions(grid) % 2 === 0) { //number of inversions is even
+        return true;
+      }
+    }
+  }
+
+  //if nothing has been returned as true; this permutation is not solvable
+  return false;
+}
+
+
 
 
 
@@ -525,7 +608,16 @@ function mousePressed() {
     && mouseY >= height - (buttonTopBottomOffset + buttonHeight) && mouseY <= height - buttonTopBottomOffset 
     && !needHelp) { //so user does not accidentally restart (lose progress) while reading instructions
 
-    grid = createRandomGrid(); //create a new randomized gameboard
+    //create random grid
+    let isSolvable = false;
+    while (isSolvable === false) {
+      grid = createRandomGrid(); //create randomized 2d array for the gameboard
+      findEmptySpace();
+  
+      //sanity check for solvability (requires x/y values of empty space)
+      isSolvable = isGridSolvable();
+      //console.log(isSolvable);
+    }
 
     //if user has already won the game and wishes to restart the winState will be set to false
     if (winState) {
