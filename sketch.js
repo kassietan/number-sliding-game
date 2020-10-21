@@ -20,6 +20,7 @@ let rectRoundEdge;
 let widthOffset, heightOffset;
 
 let emptySpaceX, emptySpaceY;
+let numberOfInversions;
 
 let startScreen = true;
 let winState = false;
@@ -73,7 +74,7 @@ function draw() {
   drawBackground();
 
   if (startScreen) {
-    drawScreenRect();
+    drawBackgroundRect();
 
     drawGridSizeChooser();
   }
@@ -118,7 +119,7 @@ function findButtonDimensions() {
 
 
 
-function drawScreenRect() { //should i change the name to drawBackgroundRect
+function drawBackgroundRect() { //should i change the name to drawBackgroundRect
   //creates a rectangle that serves as the frame/background for the text on the win screen and instruction screen
 
   //change draw settings for rectangle
@@ -200,6 +201,7 @@ function startGameGridSize3() {
     
     isSolvable = isGridSolvable();
     //console.log(isSolvable);
+
   }
 
   findSideLength(); //side length of the square tiles
@@ -222,8 +224,9 @@ function startGameGridSize4() {
     findEmptySpace();
 
     //sanity check for solvability (requires x/y values of empty space)
+    numberOfInversions = countNumberOfInversions();
     isSolvable = isGridSolvable();
-    //console.log(isSolvable);
+    console.log("Solvability is " + isSolvable);
   }
 
   findSideLength(); //side length of the square tiles
@@ -315,14 +318,16 @@ function createRandomGrid() {
   return randomGrid;
 }
 
-function countNumberOfInversions(some2dArray) {
+function countNumberOfInversions() {
   let counter = 0; //variable to count the number of inversions
   let some1dArray = [];
 
   //turn the 2d array into a 1d array
   for (let y=0; y<gridSize; y++) {
     for (let x=0; x<gridSize; x++) {
-      some1dArray.push(some2dArray[y][x]);
+      if (grid[y][x] !== 0) { //do not insert 0 (empty space) into the array because it does not count as an inversion
+        some1dArray.push(grid[y][x]); 
+      }
     }
   }
   
@@ -330,34 +335,41 @@ function countNumberOfInversions(some2dArray) {
     //check all values after some1dArray[i] to see if they are less than some1dArray[i] (that would be 1 inversion)
     for (let j = i; j<some1dArray.length; j++) {
 
-      if (some1dArray[i] > some1dArray[j] && // if some1dArray[j] less than some1dArray[i], this is an inversion
-        some1dArray[i] !== 0 && some1dArray[j] !== 0) {  //if one of the numbers is 0 (the blank space), it would not count as an inversion
+      if (some1dArray[i] > some1dArray[j]) { 
         counter++;
       }
     }
   }
   
-  //console.log(counter);
+  console.log("Number of Inversions is " + counter);
   return counter;
 }
 
 function isGridSolvable() {
 
   if (gridSize % 2 === 1) { //gridSize is 3 or 5
-    if (countNumberOfInversions(grid) % 2 === 0) { //number of inversions is even
+    if (numberOfInversions % 2 === 0) { //number of inversions is even
       return true; //yes it is solvable
     }
   }
 
   else {  //gridSize is 4
-    if (emptySpaceY+1 % 2 === 1) { //if the empty space is on an ODD NUMBERED ROW (where the first row is 1)
-      if (countNumberOfInversions(grid) % 2 === 1) { //number of inversions is odd
+
+
+    // COMBINE THIS INTO AN "AND" STATEMENT SO YOU ONLY HAVE ONE "IF"
+
+    if ((emptySpaceY+1) % 2 === 1) { //if the empty space is on an ODD NUMBERED ROW (where the first row is 1)
+      console.log("odd row");
+      if (numberOfInversions % 2 === 1) { //number of inversions is odd
+        console.log("odd inversions");
         return true;
       }
     }
 
     else { //the empty space is on an EVEN NUMBERED ROW
-      if (countNumberOfInversions(grid) % 2 === 0) { //number of inversions is even
+      console.log("even row");
+      if (numberOfInversions % 2 === 0) { //number of inversions is even
+        console.log("even inversions");
         return true;
       }
     }
@@ -523,6 +535,7 @@ function findEmptySpace() {
       }
     }
   }
+
 }
 
 function checkForWin() {
@@ -639,7 +652,7 @@ function mousePressed() {
 
 
 function drawWinScreen() {
-  drawScreenRect(); //the frame/background for the text on the win screen
+  drawBackgroundRect(); //the frame/background for the text on the win screen
 
   //change text settings
   textFont(domineBoldFont);
@@ -652,7 +665,7 @@ function drawWinScreen() {
 }
 
 function drawHelpScreen() {
-  drawScreenRect(); //the frame/background for the text on the instruction screen
+  drawBackgroundRect(); //the frame/background for the text on the instruction screen
 
   //change text settings
   textFont(domineBoldFont);
