@@ -17,8 +17,9 @@ For my major project, I will be expanding on my 2d arrays assignment. This game,
 
 
 ## Nice-to-Have List
-- adding some sort of animation element to the game (jQuery? CSS?)
-- adding an auto-solve function
+- adding some sort of animation feature to the game (jQuery? CSS?)
+- adding an auto-solve function (?)
+  - an animation feature is necessary for this addition to be compelling
 - sanity check for creating a random grid
   - there is a formula to find out if a given combination is solvable
   - in the "nice-to-have list" because the user still has the option to restart, regardless of solvability 
