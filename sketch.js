@@ -21,7 +21,9 @@ let gridSize;
 let grid;
 let gridSolution = [];
 
-let solutionGridSize3, solutionGridSize4, solutionGridSize5;
+let solutionGridSize3 = [[1,2,3],[4,5,6],[7,8,0]];
+let solutionGridSize4 = [[1,2,3,4],[5,6,7,8],[9,12,11,12],[13,14,15,0]];
+let solutionGridSize5 = [[1,2,3,4,5],[6,7,8,9,10],[11,12,13,14,15],[16,17,18,19,20],[21,21,23,24,0]];
 
 let sideLength;
 let rectRoundEdge;
@@ -34,7 +36,7 @@ let numberOfInversions;
 let startScreen = true;
 let winState = false;
 let needHelp = false;
-let playGame = true; //determines if the user can interact with the gameboard to make moves
+let playGame = false; //determines if the user can interact with the gameboard to make moves
 
 let consistentRatio; //the ratio that doesn't change, no matter the gridSize or gridLength
 let buttonGap, buttonHeight, buttonWidth, buttonTopBottomOffset;
@@ -42,7 +44,7 @@ let buttonGap, buttonHeight, buttonWidth, buttonTopBottomOffset;
 let montserratSemiBoldFont, domineBoldFont;
 
 let buttonGridSize3, buttonGridSize4, buttonGridSize5;
-let questionButton, restartButton;
+let questionButton, shuffleButton, restartButton;
 
 
 
@@ -52,10 +54,6 @@ function preload() {
   //load the fonts
   montserratSemiBoldFont = loadFont("assets/Montserrat-SemiBold.ttf");
   domineBoldFont = loadFont("assets/Domine-Bold.ttf");
-
-  loadSolutionStrings();
-
-
 }
 
 function setup() {
@@ -78,17 +76,7 @@ function setup() {
   createGridSizeButtons(); //create button elements in the DOM
   stylizeGridSizeButtons();
 
-  questionButton = createButton("?");
-  questionButton.class("shuffleQuestionButton");
-  questionButton.position(width - buttonWidth - buttonGap, height - buttonTopBottomOffset - buttonHeight - buttonHeight - buttonGap - 100);
-  questionButton.size(buttonWidth, buttonHeight);
-
-  restartButton = createButton("S");
-  restartButton.class("shuffleQuestionButton");
-  restartButton.position(width - buttonWidth - buttonGap, height - buttonTopBottomOffset - buttonHeight - 100);
-  restartButton.size(buttonWidth, buttonHeight);
-
-
+  createQuestionShuffleButton();
 }
 
 function draw() {
@@ -100,11 +88,7 @@ function draw() {
     drawGridSizeChooser();
   }
 
-  else {
-    //draw the buttons (title, shuffle, question)
-    drawButtonBoxes();
-    drawButtonText();
-
+  else { //not drawing the start screen
     if (!winState) {
       //create game board
       displayGrid();
@@ -128,13 +112,6 @@ function draw() {
   }
 }
 
-
-function loadSolutionStrings() {
-  solutionGridSize3 = loadStrings("assets/solution-3.txt");
-  solutionGridSize4 = loadStrings("assets/solution-4.txt");
-  solutionGridSize5 = loadStrings("assets/solution-5.txt");
-}
-
 function createGridSizeButtons() {
   buttonGridSize3 = createButton("3");
   buttonGridSize4 = createButton("4");
@@ -146,9 +123,11 @@ function stylizeGridSizeButtons() {
 
   //stylizing the button elements
   for (let item of arrayOfButtons) {
+    item.hide(); //this is important in preventing a "delay" in loading the CSS property (?)
     item.class("gridSizeButton");
     item.size(buttonWidth, buttonWidth);
     item.attribute("align","right");
+    item.show();
   }
 
   //positioning the button elements; adding mousePressed
@@ -164,7 +143,55 @@ function stylizeGridSizeButtons() {
 
   // testing.... mouseOver()
   //buttonGridSize3.mouseOver();
+}
 
+
+function createQuestionShuffleButton() {
+  questionButton = createButton("?");
+  // questionButton.class("gameButton");
+  questionButton.position(width - buttonWidth - buttonGap, height - buttonTopBottomOffset - buttonHeight - buttonHeight - buttonGap);
+  // questionButton.size(buttonWidth, buttonHeight);
+  questionButton.mousePressed(toggleNeedHelp);
+
+  shuffleButton = createButton("S");
+  // shuffleButton.class("gameButton");
+  shuffleButton.position(width - buttonWidth - buttonGap, height - buttonTopBottomOffset - buttonHeight);
+  // shuffleButton.size(buttonWidth, buttonHeight);
+  shuffleButton.mousePressed(shuffleGameboard);
+
+  for (let someButton of [questionButton, shuffleButton]) {
+    someButton.class("gameButton");
+    someButton.size(buttonWidth, buttonHeight);
+    someButton.hide();
+  }
+
+}
+
+
+function shuffleGameboard() {
+  if (! needHelp) { //so user does not accidentally shuffle while reading instructions
+    
+    //create random grid
+    let isSolvable = false; //sanity check boolean
+
+    while (isSolvable === false) {
+      grid = createRandomGrid(); //create randomized 2d array for the gameboard
+      findEmptySpace();
+
+      //sanity check for solvability (requires x/y values of empty space)
+      isSolvable = checkSolvability();
+    }
+
+    //if user has already won the game and wishes to shuffle the winState set to false and playGame set to true so that the player may play again
+    if (winState) {
+      winState = false;
+    }
+    playGame = true;
+  }
+}
+
+function toggleNeedHelp() {
+  needHelp = !needHelp; //toggle boolean needHelp which draws/does not draw the help screen
 }
 
 
@@ -185,7 +212,6 @@ function drawBackgroundRect() {
   rectMode(CENTER);
   strokeWeight(consistentRatio / 18); //should be ratio of width or something
 
-  // stroke("#9D4C5A"); THIS WAS THE PINK
   stroke("#45252A");
   fill("#EBBDBC"); 
 
@@ -205,43 +231,24 @@ function drawGridSizeChooser() {
 }
 
 
-function turnStringIntoGridSolution(stringFile) {
-  let gridSolution = [];
-
-  //convert grid solution (currently a string from .txt file) into a 2d array
-  for (let i=0; i<stringFile.length; i++) {
-    stringFile[i] = stringFile[i].split(",");
-  }
-
-  //loop through the gridSolution and turn the strings into numbers
-  for (let y=0; y<gridSize; y++) {
-    gridSolution.push([]);
-    for (let x=0; x<gridSize; x++) {
-      gridSolution[y][x] = int(stringFile[y][x]);
-    }
-  }
-
-  return gridSolution;
-
-}
 
 
 
 function startGameGridSize3() {
   gridSize = 3;
-  gridSolution = turnStringIntoGridSolution(solutionGridSize3);
+  gridSolution = solutionGridSize3;
   startGameGridSize();
 }
 
 function startGameGridSize4() {
   gridSize = 4;
-  gridSolution = turnStringIntoGridSolution(solutionGridSize4);
+  gridSolution = solutionGridSize4;
   startGameGridSize();
 }
 
 function startGameGridSize5() {
   gridSize = 5;
-  gridSolution = turnStringIntoGridSolution(solutionGridSize5);
+  gridSolution = solutionGridSize5;
   startGameGridSize();
 }
 
@@ -250,21 +257,39 @@ function startGameGridSize() {
 
   while (isSolvable === false) {
     grid = createRandomGrid(); //create randomized 2d array for the gameboard
-    //grid = [ [1,2,3],[4,5,6],[7,0,8]];  
+    //grid = [ [1,3,4,15],[9,11,5,6],[12,7,0,14],[2,10,13,8]];  
     findEmptySpace();
     
     //sanity check for solvability (requires x/y values of empty space)
     numberOfInversions = countNumberOfInversions();
-    isSolvable = isGridSolvable();
+    isSolvable = checkSolvability();
     //console.log(isSolvable);
   }
+
+  console.log("Number of Inversions is " + numberOfInversions);
 
   findSideLength(); //side length of the square tiles
   findOffset();
 
   hideGridSizeButtons();
+  showGameButtons();
 
   startScreen = false;
+  playGame = true;
+
+  restartButton = createButton(gridSize + "\262");
+  restartButton.hide(); //this is important in preventing a "delay" in loading the CSS property (?)
+  restartButton.class("gameButton");
+  restartButton.position(buttonGap, buttonTopBottomOffset);
+  restartButton.size(buttonWidth, buttonHeight);
+  restartButton.show();
+  restartButton.mousePressed(returnToStartScreen);
+}
+
+function returnToStartScreen() { //make sure to move this in the code to clean it up later
+  startScreen = true;
+  hideGameButtons();
+  showGridSizeButtons();
 }
 
 
@@ -294,7 +319,22 @@ function hideGridSizeButtons() {
   buttonGridSize5.hide();
 }
 
+function showGridSizeButtons() {
+  buttonGridSize3.show();
+  buttonGridSize4.show();
+  buttonGridSize5.show();
+}
 
+function hideGameButtons() {
+  questionButton.hide();
+  shuffleButton.hide();
+  restartButton.hide();
+}
+
+function showGameButtons() {
+  questionButton.show();
+  shuffleButton.show();
+}
 
 
 function createRandomGrid() {
@@ -346,38 +386,24 @@ function countNumberOfInversions() {
     }
   }
   
-  console.log("Number of Inversions is " + counter);
   return counter;
 }
 
-function isGridSolvable() {
+function checkSolvability() {
 
-  if (gridSize % 2 === 1) { //gridSize is 3 or 5
-    if (numberOfInversions % 2 === 0) { //number of inversions is even
-      return true; //yes it is solvable
-    }
+  if (gridSize % 2 === 1 && numberOfInversions % 2 === 0) { 
+    //gridSize is 3 or 5 and number of inversions is even
+
+    return true; //yes it is solvable
   }
 
-  else {  //gridSize is 4
+  else if ( (((emptySpaceY+1) % 2 === 1) && ((numberOfInversions % 2) === 1)) || 
+        //solvable if the empty space is on an ODD NUMBERED ROW (where the first row is 1) and number of inversions is odd
+        
+        (((emptySpaceY+1) % 2 === 0) && ((numberOfInversions % 2) === 0)) ) { 
+        //solvable if the empty space is on an EVEN NUMBERED ROW and number of inversions is even
 
-
-    // COMBINE THIS INTO AN "AND" STATEMENT SO YOU ONLY HAVE ONE "IF"
-
-    if ((emptySpaceY+1) % 2 === 1) { //if the empty space is on an ODD NUMBERED ROW (where the first row is 1)
-      console.log("odd row");
-      if (numberOfInversions % 2 === 1) { //number of inversions is odd
-        console.log("odd inversions");
-        return true;
-      }
-    }
-
-    else { //the empty space is on an EVEN NUMBERED ROW
-      console.log("even row");
-      if (numberOfInversions % 2 === 0) { //number of inversions is even
-        console.log("even inversions");
-        return true;
-      }
-    }
+    return true;
   }
 
   //if nothing has been returned as true; this permutation is not solvable
@@ -424,45 +450,45 @@ function drawLinePattern() {
 }
 
 
+// OLD DRAW BUTTON FUNCTIONS (FOR BOXES AND TEXT)
+// function drawButtonBoxes() {
+//   //draw settings for rects
+//   rectMode(CORNER);
+//   strokeWeight(sideLength / 25);
+//   stroke("#45252A");
+//   fill("#45252A");
 
-function drawButtonBoxes() {
-  //draw settings for rects
-  rectMode(CORNER);
-  strokeWeight(sideLength / 25);
-  stroke("#45252A");
-  fill("#45252A");
+//   //shuffle button
+//   rect(width - buttonWidth, height - buttonTopBottomOffset - buttonHeight , buttonWidth, buttonHeight, rectRoundEdge, 0, 0, rectRoundEdge);
+//   //upper question button
+//   rect(width - buttonWidth, height - buttonTopBottomOffset - buttonHeight - buttonHeight - buttonGap, buttonWidth, buttonHeight, rectRoundEdge, 0, 0, rectRoundEdge);
 
-  //shuffle button
-  rect(width - buttonWidth, height - buttonTopBottomOffset - buttonHeight , buttonWidth, buttonHeight, rectRoundEdge, 0, 0, rectRoundEdge);
-  //upper question button
-  rect(width - buttonWidth, height - buttonTopBottomOffset - buttonHeight - buttonHeight - buttonGap, buttonWidth, buttonHeight, rectRoundEdge, 0, 0, rectRoundEdge);
+//   //draw title boxes
+//   rect(0, buttonTopBottomOffset, buttonWidth, buttonHeight, 0, rectRoundEdge, rectRoundEdge, 0);
+//   rect(0, buttonTopBottomOffset + buttonHeight + buttonGap, buttonWidth, buttonHeight, 0, rectRoundEdge, rectRoundEdge, 0);
 
-  //draw title boxes
-  rect(0, buttonTopBottomOffset, buttonWidth, buttonHeight, 0, rectRoundEdge, rectRoundEdge, 0);
-  rect(0, buttonTopBottomOffset + buttonHeight + buttonGap, buttonWidth, buttonHeight, 0, rectRoundEdge, rectRoundEdge, 0);
+// }
 
-}
+// function drawButtonText() {
+//   //text settings 
+//   textFont(domineBoldFont);
+//   textSize(consistentRatio /2.5);
+//   strokeWeight(consistentRatio / 45);
+//   stroke("#FBDFDF");
+//   fill("#45252A"); //fill is same as background
+//   textAlign(CENTER, CENTER);
 
-function drawButtonText() {
-  //text settings 
-  textFont(domineBoldFont);
-  textSize(consistentRatio /2.5);
-  strokeWeight(consistentRatio / 45);
-  stroke("#FBDFDF");
-  fill("#45252A"); //fill is same as background
-  textAlign(CENTER, CENTER);
-
-  //text for question and shuffle buttons
-  text("?", width - buttonWidth / 2, height - buttonTopBottomOffset - buttonHeight - buttonGap - buttonHeight / 2 - buttonGap / 2);
+//   //text for question and shuffle buttons
+//   text("?", width - buttonWidth / 2, height - buttonTopBottomOffset - buttonHeight - buttonGap - buttonHeight / 2 - buttonGap / 2);
   
-  fill("#45252A"); //fill is same as background
-  text("S", width - buttonWidth / 2, height - buttonTopBottomOffset - buttonHeight / 2 - buttonGap / 2);
+//   fill("#45252A"); //fill is same as background
+//   text("S", width - buttonWidth / 2, height - buttonTopBottomOffset - buttonHeight / 2 - buttonGap / 2);
 
-  //title text
-  text(" " + gridSize + "\262", 0, buttonTopBottomOffset - buttonGap / 2, buttonWidth, buttonHeight);
-  //textSize(sideLength / 6); //"TILES" must be written smaller in order to "fit" in the button
-  text(" \253", 0, buttonTopBottomOffset + buttonHeight + buttonGap / 2, buttonWidth, buttonHeight);
-}
+//   //title text
+//   text(" " + gridSize + "\262", 0, buttonTopBottomOffset - buttonGap / 2, buttonWidth, buttonHeight);
+//   //textSize(sideLength / 6); //"TILES" must be written smaller in order to "fit" in the button
+//   text(" \253", 0, buttonTopBottomOffset + buttonHeight + buttonGap / 2, buttonWidth, buttonHeight);
+// }
 
 
 function displayGrid() {
@@ -620,37 +646,20 @@ function mousePressed() {
 
   }
 
-  //shuffle button
-  if (mouseX >= width - buttonWidth && mouseX <= width 
-    && mouseY >= height - (buttonTopBottomOffset + buttonHeight) && mouseY <= height - buttonTopBottomOffset 
-    && !needHelp) { //so user does not accidentally shuffle (lose progress) while reading instructions
+  // //shuffle button
+  // if (mouseX >= width - buttonWidth && mouseX <= width 
+  //   && mouseY >= height - (buttonTopBottomOffset + buttonHeight) && mouseY <= height - buttonTopBottomOffset 
+  //   && !needHelp) { //so user does not accidentally shuffle (lose progress) while reading instructions
 
-    //create random grid
-    let isSolvable = false;
-    while (isSolvable === false) {
-      grid = createRandomGrid(); //create randomized 2d array for the gameboard
-      findEmptySpace();
-  
-      //sanity check for solvability (requires x/y values of empty space)
-      isSolvable = isGridSolvable();
-      //console.log(isSolvable);
-    }
+  // }
 
-    //if user has already won the game and wishes to shuffle the winState will be set to false
-    if (winState) {
-      winState = false;
-    }
-
-    playGame = true;
-  }
-
-  //question button
-  if (mouseX >= width - buttonWidth && mouseX <= width &&
-    mouseY >= height - (buttonTopBottomOffset + buttonHeight + buttonGap + buttonHeight) && 
-    mouseY <= height - (buttonTopBottomOffset + buttonHeight + buttonGap)) { 
+  // //question button
+  // if (mouseX >= width - buttonWidth && mouseX <= width &&
+  //   mouseY >= height - (buttonTopBottomOffset + buttonHeight + buttonGap + buttonHeight) && 
+  //   mouseY <= height - (buttonTopBottomOffset + buttonHeight + buttonGap)) { 
     
-    needHelp = !needHelp; //toggle boolean needHelp which draws/does not draw the help screen
-  }
+    
+  // }
 }
 
 
@@ -661,6 +670,7 @@ function drawWinScreen() {
   //change text settings
   textFont(domineBoldFont);
   stroke("#45252A");
+  fill("#FBDFDF");
   textSize(consistentRatio);
   strokeWeight(consistentRatio / 10);
 
@@ -684,7 +694,8 @@ function drawHelpScreen() {
 1. Click on the squares surrounding the empty square to move\n
 2. The goal is to order the numbers from 1 to ${gridSize*gridSize - 1} with the empty space in the bottom right corner\n
 3. Click the S button to shuffle the board\n
-4. Good luck!
+4. Click the ${gridSize + "\262"} button to change the grid size \n
+5. Good luck!
 
 *click on the question mark to exit`, width / 2, height / 2, sideLength * (gridSize-0.5), sideLength * (gridSize-0.5));
 }

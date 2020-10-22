@@ -29,9 +29,9 @@ body, html {
     color: #FBDFDF;
 }
 
-.shuffleQuestionButton {
+.gameButton {
     background-color: #45252A;
-    border: 6px solid #45252A;
+    border: 5px solid #45252A;
 
     color: #FBDFDF;
     font-family: 'Domine', serif;
@@ -46,7 +46,7 @@ body, html {
 
 }
 
-.shuffleQuestionButton:hover {
+.gameButton:hover {
     background-color: #EBBDBC;
     color: #45252A;
 }
