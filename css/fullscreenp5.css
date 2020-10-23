@@ -30,7 +30,7 @@ body, html {
 }
 
 .gameButton {
-    background-color: #45252A;
+    background-color: #562F35;
     border: 5px solid #45252A;
 
     color: #FBDFDF;
@@ -42,7 +42,7 @@ body, html {
 
     border-radius: 15px;
     opacity: 1;
-    transition: 0.7s;
+    transition: 0.5s;
 
 }
 
@@ -52,13 +52,4 @@ body, html {
 }
 
 
-
-  
-/* How to use Javascript variables in CSS? */
-/* https://stackoverflow.com/questions/49402471/how-to-use-javascript-variables-in-css */
  
-/* fade in effect for button hover */
-/* https://www.w3schools.com/css/tryit.asp?filename=trycss_buttons_fade */
-
-
-/* font-family: 'Montserrat', sans-serif; */
