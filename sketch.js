@@ -85,6 +85,7 @@ function setup() {
 
 function draw() {
   drawBackground();
+  drawBackgroundRect();
 
   if (startScreen) {
     drawStartScreen();
@@ -250,7 +251,7 @@ function drawLinePattern() {
 
 
 function drawStartScreen() {
-  drawBackgroundRect();
+  // drawBackgroundRect();
 
   //style settings for text
   stroke("#45252A");
@@ -266,13 +267,22 @@ function drawStartScreen() {
 function drawBackgroundRect() { 
   //creates a rectangle that serves as the frame/background for the text on the win screen and instruction screen and start screen
 
-  //change draw settings for rectangle
-  rectMode(CENTER);
-  strokeWeight(consistentRatio / 18);
-  stroke("#45252A");
-  fill("#EBBDBC"); 
+  //draw larger, darker rectangle frame first
 
-  //draw background rectangle
+  //style settings for large rectangle
+  rectMode(CENTER);
+  strokeWeight(0);
+  stroke("#45252A");
+  fill("#45252A");
+
+  rect(width/2, height/2, consistentRatio*4.4, consistentRatio*4.4, rectRoundEdge);
+
+  
+  //change draw settings for smaller rectangle
+  strokeWeight(consistentRatio / 18);
+  stroke("#9D4C5A");
+  fill("#EBBDBC"); //light pink
+
   rect(width / 2, height / 2, consistentRatio * 4, consistentRatio * 4, rectRoundEdge);
 }
 
@@ -452,18 +462,13 @@ function showGameButtons() {
 
 function displayGrid() {
   //draw gameboard frame and background
+  // drawBackgroundRect();
 
-  //draw settings for gameboard background rectangles
-  strokeWeight(0);
+  //fill in the gaps from the rounded corners of the tiles
   rectMode(CENTER);
-
-  //rectangular gameboard frame 
-  fill("#45252A"); //dark burgundy 
-  rect(width / 2, height / 2, sideLength * (gridSize * 1.1), sideLength * (gridSize * 1.1), rectRoundEdge); 
-
-  //fill in the gaps from the rounded corners of the gameboard
+  stroke("#45252A");
   fill("#9D4C5A"); //pink (same as stroke colour of each number square on the gameboard)
-  rect(width / 2, height / 2, sideLength * (gridSize - 1), sideLength * (gridSize - 1), rectRoundEdge);
+  rect(width / 2, height / 2, sideLength * gridSize, sideLength * gridSize, rectRoundEdge);
 
 
   //draw setting for the squares on the gameboard
@@ -657,7 +662,7 @@ function returnToStartScreen() {
 
 
 function drawWinScreen() {
-  drawBackgroundRect(); //the frame/background for the text on the win screen
+  // drawBackgroundRect(); //the frame/background for the text on the win screen
 
   //change text settings
   textFont(domineBoldFont);
@@ -672,7 +677,7 @@ function drawWinScreen() {
 }
 
 function drawHelpScreen() {
-  drawBackgroundRect(); //the frame/background for the text on the instruction screen
+  drawBackgroundRect(); //call the function again to draw over the game board tiles to show the instruction text
 
   //change text settings
   textFont(domineBoldFont);
@@ -688,7 +693,7 @@ function drawHelpScreen() {
 2. The goal is to order the numbers from 1 to ${gridSize*gridSize - 1} with the empty space in the bottom right corner\n
 3. Click the S button to shuffle the board\n
 4. Click the ${gridSize + "\262"} button to change the grid size \n
-5. Good luck!
+GOOD LUCK!
 
 *click on the question mark to exit`, width / 2, height / 2, sideLength * (gridSize-0.5), sideLength * (gridSize-0.5));
 }
