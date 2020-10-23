@@ -23,6 +23,8 @@
 // Using setTimeout() 
 // - https://www.sitepoint.com/delay-sleep-pause-wait/ 
 
+
+
 let gridSize;
 let grid;
 let gridSolution = [];
@@ -31,6 +33,7 @@ let solutionGridSize3 = [[1,2,3],[4,5,6],[7,8,0]];
 let solutionGridSize4 = [[1,2,3,4],[5,6,7,8],[9,10,11,12],[13,14,15,0]];
 let solutionGridSize5 = [[1,2,3,4,5],[6,7,8,9,10],[11,12,13,14,15],[16,17,18,19,20],[21,22,23,24,0]];
 
+let consistentRatio; //the ratio that doesn't change, no matter the gridSize or gridLength
 let sideLength;
 let rectRoundEdge;
 
@@ -44,52 +47,47 @@ let winState = false;
 let needHelp = false;
 let playGame = false; //determines if the user can interact with the gameboard to make moves
 
-let consistentRatio; //the ratio that doesn't change, no matter the gridSize or gridLength
-let buttonGap, buttonHeight, buttonWidth, buttonTopBottomOffset;
-
-let montserratSemiBoldFont, domineBoldFont;
-
+let buttonGap, buttonLength, buttonTopBottomOffset, buttonTextSize;
 let buttonGridSize3, buttonGridSize4, buttonGridSize5;
 let questionButton, shuffleButton, restartButton;
+
+let montserratSemiBoldFont, domineBoldFont;
 
 
 
 
 
 function preload() {
-  //load the fonts
+  //load fonts
   montserratSemiBoldFont = loadFont("assets/Montserrat-SemiBold.ttf");
   domineBoldFont = loadFont("assets/Domine-Bold.ttf");
 }
 
-function setup() {
-  //createCanvas(windowWidth, windowHeight);
-  createCanvas(1200, 675); //"ideal" 16:9 aspect ratio; prevents any "overlap" of elements
 
-  //determine consistentRatio; number that is used to draw everything and is NOT dependant on the gridSize or gridLength
-  if (height <= width) {
-    consistentRatio = height/5.5; 
-  }
-  else {
-    consistentRatio = width/5.5;
-  }
+
+function setup() {
+  createCanvas(windowWidth, windowHeight);
+  //createCanvas(1200, 675); //"ideal" 16:9 aspect ratio; prevents any "overlap" of elements
+
+  findConsistentRatio();
 
   rectRoundEdge = consistentRatio / 10; //how rounded the edges are
 
   //determining dimensions of the "buttons" (title, shuffle, question buttons)
   findButtonDimensions();
 
-  createGridSizeButtons(); //create button elements in the DOM; buttons to choose the size of the grid
-
-  createQuestionShuffleButtons(); //create button elements for help/instructions and shuffling the gameboard
+  //create button elements
+  createGridSizeButtons(); //buttons to choose the size of the grid
+  createQuestionShuffleButtons(); //button elements for help/instructions and shuffling the gameboard
 }
+
+
 
 function draw() {
   drawBackground();
 
   if (startScreen) {
-    drawBackgroundRect(); //background rectangle frame
-    drawGridSizeChooserText(); //draw text "Choose a Grid Size" on canvas
+    drawStartScreen();
   }
 
   else { //game has started
@@ -116,52 +114,78 @@ function draw() {
 }
 
 
+
+
+function findConsistentRatio() {
+  //determine consistentRatio; number that is used to draw everything and is NOT dependant on the gridSize or gridLength
+  if (height <= width) {
+    consistentRatio = height/5.5; 
+  }
+  else {
+    consistentRatio = width/5.5;
+  }
+}
+
+function findButtonDimensions() {
+  buttonGap = consistentRatio / 10; //gap between buttons beside each other
+  buttonLength = consistentRatio / 1.5; //width of each button
+  buttonTopBottomOffset = consistentRatio; //the distance between the button and the top/bottom (which ever is closest)
+  
+  buttonTextSize = buttonLength/2;
+}
+
+
+
+
 function createGridSizeButtons() {
   //creates the buttons that are used to select/change the gridSize
 
   //create, position on the canvas, and add mousePressed functions to the button elements
 
   buttonGridSize3 = createButton("3");
-  buttonGridSize3.position(width/2 - buttonWidth*2, height/2);
+  buttonGridSize3.position(width/2 - buttonLength*2, height/2);
   buttonGridSize3.mousePressed(startGameGridSize3);
 
   buttonGridSize4 = createButton("4");
-  buttonGridSize4.position(width/2 - buttonWidth*0.5, height/2);
+  buttonGridSize4.position(width/2 - buttonLength*0.5, height/2);
   buttonGridSize4.mousePressed(startGameGridSize4);
 
   buttonGridSize5 = createButton("5");
-  buttonGridSize5.position(width/2 + buttonWidth, height/2);
+  buttonGridSize5.position(width/2 + buttonLength, height/2);
   buttonGridSize5.mousePressed(startGameGridSize5);
 
   //stylizing the button elements for choosing grid size
-  for (let item of [buttonGridSize3, buttonGridSize4, buttonGridSize5]) {
-    item.hide(); //this is important in preventing a "delay" in loading the CSS property (?)
-    item.class("gridSizeButton");
-    item.size(buttonWidth, buttonWidth); //square-shaped buttons
-    item.attribute("align","right");
-    item.show();
+  for (let someButton of [buttonGridSize3, buttonGridSize4, buttonGridSize5]) {
+    someButton.hide(); //this is important in preventing a "delay" in loading the CSS property (?)
+
+    someButton.class("gridSizeButton");
+    someButton.size(buttonLength, buttonLength); //square-shaped buttons
+    someButton.attribute("align","right");
+    someButton.style("font-size", buttonTextSize + "px");
+
+    someButton.show();
   }
 }
-
 
 function createQuestionShuffleButtons() {
   //creates user interactive buttons to show the help screen or shuffle the gameboard (same grid size)
 
   //create the question button element
   questionButton = createButton("?");
-  questionButton.position(width - buttonWidth - buttonGap, height - buttonTopBottomOffset - buttonHeight - buttonHeight - buttonGap);
+  questionButton.position(width - buttonLength - buttonGap, height - buttonTopBottomOffset - buttonLength - buttonLength - buttonGap);
   questionButton.mousePressed(toggleNeedHelp); //question button triggers the help/instructions screen
 
   //create shuffle button element
   shuffleButton = createButton("S");
-  shuffleButton.position(width - buttonWidth - buttonGap, height - buttonTopBottomOffset - buttonHeight);
+  shuffleButton.position(width - buttonLength - buttonGap, height - buttonTopBottomOffset - buttonLength);
   shuffleButton.mousePressed(shuffleGameboard); //"S" shuffle button shuffles the game board (with same grid size)
 
   //stylize question and shuffle buttons
   for (let someButton of [questionButton, shuffleButton]) {
     someButton.hide(); //buttons created upon setup(); not needed in the start screen so must be hidden
     someButton.class("gameButton");
-    someButton.size(buttonWidth, buttonHeight);
+    someButton.style("font-size", buttonTextSize + "px");
+    someButton.size(buttonLength, buttonLength);
   }
 
 }
@@ -174,79 +198,83 @@ function createRestartButton() {
   //stylize and add mousePressed function to restart the game
   restartButton.class("gameButton");
   restartButton.position(buttonGap, buttonTopBottomOffset);
-  restartButton.size(buttonWidth, buttonHeight);
+  restartButton.size(buttonLength, buttonLength);
   restartButton.mousePressed(returnToStartScreen);
+
+
+  //testing
+  restartButton.style("font-size", buttonTextSize + "px");
 
   restartButton.show();
 }
 
-function shuffleGameboard() {
-  //randomly shuffle the tiles with the SAME gridSize
 
-  if (! needHelp) { //so user does not accidentally shuffle while reading instructions
-    
-    //create random grid
 
-    let isSolvable = false; //sanity check boolean; records whether or not the randomzied grid is solvable
 
-    while (isSolvable === false) {
-      grid = createRandomGrid(); //create randomized 2d array for the gameboard
+function drawBackground() {
+  background("#7A3E48");
+  drawLinePattern();
+}
 
-      findEmptySpace(); //find the x,y coordinates of the empty space
+function drawLinePattern() {
+  //draw the line background pattern (does not scale to size of canvas; meant to serve as a consistent "wallpaper")
+  
+  //draw settings for the line background pattern
+  strokeWeight(1);
+  stroke("#45252A");
+  let forwardSlash = true;
 
-      //sanity check for solvability (requires x/y values of empty space)
-      isSolvable = checkSolvability();
+  let numberOfVerticalIterations = floor(height/20); //determines number of times the "slash" is drawn vertically
+
+  //ensure that it iterates vertically an EVEN number of times
+  if (numberOfVerticalIterations % 2 === 1) {
+    numberOfVerticalIterations++;
+  } 
+
+  //draw the "slash" pattern
+  for (let x = 0; x < width; x += 20) {
+    for (let y = 0; y < numberOfVerticalIterations; y++) {
+      if (forwardSlash === true) {
+        line(x, y*20, x + 5, y*20 + 5);
+      }
+      else {
+        line(x + 5, y*20, x, y*20 + 5);
+      }
+      forwardSlash = !forwardSlash;
     }
-
-    //if user has already won the game and wishes to shuffle the winState set to false and playGame set to true so that the player may play again
-    if (winState) {
-      winState = false;
-    }
-    playGame = true;
+    forwardSlash = !forwardSlash;
   }
 }
 
-function toggleNeedHelp() {
-  needHelp = !needHelp; //toggle boolean needHelp which draws/does not draw the help screen
-}
-
-
-function findButtonDimensions() {
-  buttonGap = consistentRatio / 10; //gap between buttons beside each other
-  buttonHeight = consistentRatio / 1.75; //height of each button
-  buttonWidth = consistentRatio / 1.5; //width of each button
-  buttonTopBottomOffset = consistentRatio; //the distance between the button and the top/bottom (which ever is closest) 
-}
 
 
 
+function drawStartScreen() {
+  drawBackgroundRect();
 
-function drawBackgroundRect() { 
-  //creates a rectangle that serves as the frame/background for the text on the win screen and instruction screen
-
-  //change draw settings for rectangle
-  rectMode(CENTER);
-  strokeWeight(consistentRatio / 18); //should be ratio of width or something
-
-  stroke("#45252A");
-  fill("#EBBDBC"); 
-
-  //create background rectangle
-  rect(width / 2, height / 2, consistentRatio * 4, consistentRatio * 4, rectRoundEdge);
-}
-
-
-function drawGridSizeChooserText() {
+  //style settings for text
   stroke("#45252A");
   fill("#45252A");
   textAlign(CENTER, CENTER);
   textFont(domineBoldFont);
   strokeWeight(1);
   textSize(consistentRatio/4);
+
   text("Choose a Grid Size", width/2, height/2 - consistentRatio);
 }
 
+function drawBackgroundRect() { 
+  //creates a rectangle that serves as the frame/background for the text on the win screen and instruction screen and start screen
 
+  //change draw settings for rectangle
+  rectMode(CENTER);
+  strokeWeight(consistentRatio / 18);
+  stroke("#45252A");
+  fill("#EBBDBC"); 
+
+  //draw background rectangle
+  rect(width / 2, height / 2, consistentRatio * 4, consistentRatio * 4, rectRoundEdge);
+}
 
 
 
@@ -286,68 +314,16 @@ function startGameGridSize() {
   findSideLength(); //side length of the square tiles
   findOffset(); //find offset values to centre the game board vertically and horizontally
 
-  //hide/show important buttons
+  //hide/show/create button elements to prepare for game board
   hideGridSizeButtons(); 
   showGameButtons();
+  createRestartButton();
 
   startScreen = false;
   playGame = true;
-
-  createRestartButton();
-}
-
-function returnToStartScreen() { //make sure to move this in the code to clean it up later
-  startScreen = true;
-  winState = false;
-  playGame = false;
-
-  hideGameButtons();
-  showGridSizeButtons();
 }
 
 
-function findSideLength() {
-  //find the side length of the squares based on the dimensions of the canvas and gridSize
-
-  if (height <= width) {
-    sideLength = height/5.5 * 4 / gridSize; //original sideLength = (height / 5.5); i want the same total width (hence *4) but for the respective gridSize (hence /gridSize)
-  }
-  else {
-    sideLength = width/5.5 * 4 / gridSize;
-  }
-}
-
-function findOffset() {
-  //find the offset values to centre the grid in the middle of the canvas
-  widthOffset = width/2 - sideLength*(gridSize/2);
-  heightOffset = height/2 - sideLength*(gridSize/2);
-}
-
-
-
-
-function hideGridSizeButtons() {
-  buttonGridSize3.hide();  
-  buttonGridSize4.hide();
-  buttonGridSize5.hide();
-}
-
-function showGridSizeButtons() {
-  buttonGridSize3.show();
-  buttonGridSize4.show();
-  buttonGridSize5.show();
-}
-
-function hideGameButtons() {
-  questionButton.hide();
-  shuffleButton.hide();
-  restartButton.hide();
-}
-
-function showGameButtons() {
-  questionButton.show();
-  shuffleButton.show();
-}
 
 
 function createRandomGrid() {
@@ -390,9 +366,9 @@ function countNumberOfInversions() {
   }
   
   for (let i=0; i<some1dArray.length; i++) {
-    //check all values after some1dArray[i] to see if they are less than some1dArray[i] (that would be 1 inversion)
+    //check all values after some1dArray[i] to see if they are less than some1dArray[i] (that would be one inversion)
+    
     for (let j = i; j<some1dArray.length; j++) {
-
       if (some1dArray[i] > some1dArray[j]) { 
         counter++;
       }
@@ -427,44 +403,50 @@ function checkSolvability() {
 
 
 
+function findSideLength() {
+  //find the side length of the squares based on the dimensions of the canvas and gridSize
 
-
-function drawBackground() {
-  background("#7A3E48");
-  //764145
-
-  drawLinePattern();
-}
-
-function drawLinePattern() {
-  //draw the line background pattern (does not scale to size of canvas; meant to serve as a consistent "wallpaper")
-  
-  //draw settings for the line background pattern
-  strokeWeight(1);
-  stroke("#45252A");
-  let forwardSlash = true;
-
-  let numberOfVerticalIterations = floor(height/20); //determines number of times the "slash" is drawn vertically
-
-  //ensure that it iterates vertically an EVEN number of times
-  if (numberOfVerticalIterations % 2 === 1) {
-    numberOfVerticalIterations++;
-  } 
-
-  //draw the "slash" pattern
-  for (let x = 0; x < width; x += 20) {
-    for (let y = 0; y < numberOfVerticalIterations; y++) {
-      if (forwardSlash === true) {
-        line(x, y*20, x + 5, y*20 + 5);
-      }
-      else {
-        line(x + 5, y*20, x, y*20 + 5);
-      }
-      forwardSlash = !forwardSlash;
-    }
-    forwardSlash = !forwardSlash;
+  if (height <= width) {
+    sideLength = height/5.5 * 4 / gridSize; //original sideLength = (height / 5.5); i want the same total width (hence *4) but for the respective gridSize (hence /gridSize)
+  }
+  else {
+    sideLength = width/5.5 * 4 / gridSize;
   }
 }
+
+function findOffset() {
+  //find the offset values to centre the grid in the middle of the canvas
+  widthOffset = width/2 - sideLength*(gridSize/2);
+  heightOffset = height/2 - sideLength*(gridSize/2);
+}
+
+
+
+
+
+function hideGridSizeButtons() {
+  buttonGridSize3.hide();  
+  buttonGridSize4.hide();
+  buttonGridSize5.hide();
+}
+
+function showGridSizeButtons() {
+  buttonGridSize3.show();
+  buttonGridSize4.show();
+  buttonGridSize5.show();
+}
+
+function hideGameButtons() {
+  questionButton.hide();
+  shuffleButton.hide();
+  restartButton.hide();
+}
+
+function showGameButtons() {
+  questionButton.show();
+  shuffleButton.show();
+}
+
 
 
 
@@ -531,44 +513,6 @@ function displayNumbers() {
 
 
 
-function findEmptySpace() {
-  //side note: because the grid variable is a 2d array, we cannot use indexOf() to find the 0 value
-
-  //iterate through the grid to find the 0 value; set its X and Y coordinates in the 2d array
-  for (let y = 0; y < gridSize; y++) {
-    for (let x = 0; x < gridSize; x++) {
-      if (grid[y][x] === 0) {
-        emptySpaceY = y;
-        emptySpaceX = x;
-      }
-    }
-  }
-}
-
-function checkForWin() {
-  let errorCounter = 0;
-
-  //compare the grid (user-interacted 2d array) and gridSolution
-  for (let y = 0; y < gridSize; y++) {
-    for (let x = 0; x < gridSize; x++) {
-      if (grid[y][x] !== gridSolution[y][x]) {
-        //any coinciding x,y values that do not match up are an error
-        errorCounter++;
-      }
-    }
-  }
-
-  if (errorCounter === 0) { //if there are no errors (grid matches gridSolution), then the game is solved
-    playGame = false; //to account for the "wait" time before the win screen is drawn
-
-    //"wait" time so user has time to see their puzzle solution before win screen is drawn
-    setTimeout(() => { 
-      winState = true; 
-    }, 350);
-  }
-}
-
-
 
 function mousePressed() {
 
@@ -628,6 +572,90 @@ function mousePressed() {
 
 
 
+
+function findEmptySpace() {
+  //side note: because the grid variable is a 2d array, we cannot use indexOf() to find the 0 value
+
+  //iterate through the grid to find the 0 value; set its X and Y coordinates in the 2d array
+  for (let y = 0; y < gridSize; y++) {
+    for (let x = 0; x < gridSize; x++) {
+      if (grid[y][x] === 0) {
+        emptySpaceY = y;
+        emptySpaceX = x;
+      }
+    }
+  }
+}
+
+function checkForWin() {
+  let errorCounter = 0;
+
+  //compare the grid (user-interacted 2d array) and gridSolution
+  for (let y = 0; y < gridSize; y++) {
+    for (let x = 0; x < gridSize; x++) {
+      if (grid[y][x] !== gridSolution[y][x]) {
+        //any coinciding x,y values that do not match up are an error
+        errorCounter++;
+      }
+    }
+  }
+
+  if (errorCounter === 0) { //if there are no errors (grid matches gridSolution), then the game is solved
+    playGame = false; //to account for the "wait" time before the win screen is drawn
+
+    //"wait" time so user has time to see their puzzle solution before win screen is drawn
+    setTimeout(() => { 
+      winState = true; 
+    }, 350);
+  }
+}
+
+
+
+
+function shuffleGameboard() {
+  //randomly shuffle the tiles with the SAME gridSize
+
+  if (! needHelp) { //so user does not accidentally shuffle while reading instructions
+    
+    //create random grid
+
+    let isSolvable = false; //sanity check boolean; records whether or not the randomzied grid is solvable
+
+    while (isSolvable === false) {
+      grid = createRandomGrid(); //create randomized 2d array for the gameboard
+
+      findEmptySpace(); //find the x,y coordinates of the empty space
+
+      //sanity check for solvability (requires x/y values of empty space)
+      isSolvable = checkSolvability();
+    }
+
+    //if user has already won the game and wishes to shuffle the winState set to false and playGame set to true so that the player may play again
+    if (winState) {
+      winState = false;
+    }
+    playGame = true;
+  }
+}
+
+function toggleNeedHelp() {
+  needHelp = !needHelp; //toggle boolean needHelp which draws/does not draw the help screen
+}
+
+function returnToStartScreen() { 
+  startScreen = true;
+  winState = false;
+  playGame = false;
+  needHelp = false;
+
+  hideGameButtons();
+  showGridSizeButtons();
+}
+
+
+
+
 function drawWinScreen() {
   drawBackgroundRect(); //the frame/background for the text on the win screen
 
@@ -651,7 +679,7 @@ function drawHelpScreen() {
   textAlign(CENTER, CENTER);
   fill("#45252A");
   strokeWeight(0);
-  textSize(consistentRatio /7);
+  textSize(consistentRatio /6.5);
 
   //write instruction text
   text(`CONFUSED?
