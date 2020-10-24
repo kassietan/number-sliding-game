@@ -10,7 +10,7 @@ body, html {
  
 .gridSizeButton { 
     background-color: #FBDFDF;
-    border: 5px solid #45252A;
+    /* border: 5px solid #45252A; */
 
     color: #45252A;
     font-family: 'Domine', serif;
@@ -19,7 +19,7 @@ body, html {
 
     cursor: pointer;
 
-    border-radius: 8px;
+    /* border-radius: 8px; */
     opacity: 1;
     transition: 0.4s;
 }
@@ -31,7 +31,7 @@ body, html {
 
 .gameButton {
     background-color: #562F35;
-    border: 5px solid #45252A;
+    /* border: 5px solid #45252A; */
 
     color: #FBDFDF;
     font-family: 'Domine', serif;
@@ -40,7 +40,7 @@ body, html {
 
     cursor: pointer;
 
-    border-radius: 15px;
+    /* border-radius: 15px; */
     opacity: 1;
     transition: 0.5s;
 

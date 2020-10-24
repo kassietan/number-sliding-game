@@ -2,12 +2,7 @@
 // Kassie Tan
 // October 27th, 2020
 //
-// Extra for Experts:
-// - I spent a lot of time working on the visual design of the code
-// - my efforts were spent on the UI
-// - I (might) continue working on this for my major project by creating some sort of auto-solve function (this is, of course, subject to change)
 // 
-//
 // SOURCES
 // 
 // CSS Fade-in Effect on hover
@@ -120,17 +115,17 @@ function draw() {
 function findConsistentRatio() {
   //determine consistentRatio; number that is used to draw everything and is NOT dependant on the gridSize or gridLength
   if (height <= width) {
-    consistentRatio = height/5.5; 
+    consistentRatio = height/6; 
   }
   else {
-    consistentRatio = width/5.5;
+    consistentRatio = width/6;
   }
 }
 
 function findButtonDimensions() {
   buttonGap = consistentRatio / 10; //gap between buttons beside each other
   buttonLength = consistentRatio / 1.5; //width of each button
-  buttonTopBottomOffset = consistentRatio; //the distance between the button and the top/bottom (which ever is closest)
+  buttonTopBottomOffset = consistentRatio / 2; //the distance between the button and the top/bottom (which ever is closest)
   
   buttonTextSize = buttonLength/2;
 }
@@ -144,15 +139,15 @@ function createGridSizeButtons() {
   //create, position on the canvas, and add mousePressed functions to the button elements
 
   buttonGridSize3 = createButton("3");
-  buttonGridSize3.position(width/2 - buttonLength*2, height/2);
+  buttonGridSize3.position(width/2 - buttonLength*2, height/2 + consistentRatio/3);
   buttonGridSize3.mousePressed(startGameGridSize3);
 
   buttonGridSize4 = createButton("4");
-  buttonGridSize4.position(width/2 - buttonLength*0.5, height/2);
+  buttonGridSize4.position(width/2 - buttonLength*0.5, height/2 + consistentRatio/3);
   buttonGridSize4.mousePressed(startGameGridSize4);
 
   buttonGridSize5 = createButton("5");
-  buttonGridSize5.position(width/2 + buttonLength, height/2);
+  buttonGridSize5.position(width/2 + buttonLength, height/2 + consistentRatio/3);
   buttonGridSize5.mousePressed(startGameGridSize5);
 
   //stylizing the button elements for choosing grid size
@@ -161,8 +156,11 @@ function createGridSizeButtons() {
 
     someButton.class("gridSizeButton");
     someButton.size(buttonLength, buttonLength); //square-shaped buttons
-    someButton.attribute("align","right");
+
+    //css style settings (scale to canvas size)
     someButton.style("font-size", buttonTextSize + "px");
+    someButton.style("border", buttonTextSize/7 + "px solid #45252A");
+    someButton.style("border-radius", buttonTextSize/3 + "px");
 
     someButton.show();
   }
@@ -185,8 +183,12 @@ function createQuestionShuffleButtons() {
   for (let someButton of [questionButton, shuffleButton]) {
     someButton.hide(); //buttons created upon setup(); not needed in the start screen so must be hidden
     someButton.class("gameButton");
-    someButton.style("font-size", buttonTextSize + "px");
     someButton.size(buttonLength, buttonLength);
+
+    someButton.style("font-size", buttonTextSize + "px");
+    someButton.style("border", buttonTextSize/7 + "px solid #45252A");
+    someButton.style("border-radius", buttonTextSize/3 + "px");
+
   }
 
 }
@@ -196,15 +198,17 @@ function createRestartButton() {
   restartButton = createButton(gridSize + "\262");
   restartButton.hide(); //this is important in preventing a "delay" in loading the CSS property (?)
 
-  //stylize and add mousePressed function to restart the game
+  //stylize and add mousePressed
   restartButton.class("gameButton");
   restartButton.position(buttonGap, buttonTopBottomOffset);
   restartButton.size(buttonLength, buttonLength);
+
+  //css style attributes (scale to canvas size)
   restartButton.mousePressed(returnToStartScreen);
 
-
-  //testing
   restartButton.style("font-size", buttonTextSize + "px");
+  restartButton.style("border", buttonTextSize/7 + "px solid #45252A");
+  restartButton.style("border-radius", buttonTextSize/3 + "px");
 
   restartButton.show();
 }
@@ -251,24 +255,25 @@ function drawLinePattern() {
 
 
 function drawStartScreen() {
-  // drawBackgroundRect();
-
   //style settings for text
   stroke("#45252A");
   fill("#45252A");
   textAlign(CENTER, CENTER);
   textFont(domineBoldFont);
+
   strokeWeight(1);
   textSize(consistentRatio/4);
+  text("NUMBER SLIDER GAME", width/2, height/2 - consistentRatio*1);
 
-  text("Choose a Grid Size", width/2, height/2 - consistentRatio);
+  strokeWeight(0);
+  textSize(consistentRatio/6);
+  text("Choose a Grid Size!", width/2, height/2 - consistentRatio/6);
 }
 
 function drawBackgroundRect() { 
-  //creates a rectangle that serves as the frame/background for the text on the win screen and instruction screen and start screen
+  //draws a rectangle that serves as the frame/background for the text on the win screen and instruction screen and start screen
 
   //draw larger, darker rectangle frame first
-
   //style settings for large rectangle
   rectMode(CENTER);
   strokeWeight(0);
@@ -277,7 +282,7 @@ function drawBackgroundRect() {
 
   rect(width/2, height/2, consistentRatio*4.4, consistentRatio*4.4, rectRoundEdge);
 
-  
+  //drawing a smaller rectangle
   //change draw settings for smaller rectangle
   strokeWeight(consistentRatio / 18);
   stroke("#9D4C5A");
@@ -417,10 +422,10 @@ function findSideLength() {
   //find the side length of the squares based on the dimensions of the canvas and gridSize
 
   if (height <= width) {
-    sideLength = height/5.5 * 4 / gridSize; //original sideLength = (height / 5.5); i want the same total width (hence *4) but for the respective gridSize (hence /gridSize)
+    sideLength = height/6 * 4 / gridSize; //original sideLength = (height / 5.5); i want the same total width (hence *4) but for the respective gridSize (hence /gridSize)
   }
   else {
-    sideLength = width/5.5 * 4 / gridSize;
+    sideLength = width/6 * 4 / gridSize;
   }
 }
 
@@ -462,7 +467,6 @@ function showGameButtons() {
 
 function displayGrid() {
   //draw gameboard frame and background
-  // drawBackgroundRect();
 
   //fill in the gaps from the rounded corners of the tiles
   rectMode(CENTER);
@@ -502,6 +506,7 @@ function displayNumbers() {
   textFont(montserratSemiBoldFont);
   textSize(sideLength / 2);
   textAlign(CENTER, TOP);
+  rectMode(CORNER);
 
   //iterate through the 2d array (grid) and draw the values on the gameboard
   for (let y = 0; y < gridSize; y++) {
@@ -662,7 +667,6 @@ function returnToStartScreen() {
 
 
 function drawWinScreen() {
-  // drawBackgroundRect(); //the frame/background for the text on the win screen
 
   //change text settings
   textFont(domineBoldFont);
