@@ -16,13 +16,14 @@ Main Additions Include:
 - sanity check that determines if the randomized grid is solvable or not
 
 ## Completion of the Need-To-Have List? Anything in the Nice-To-Have List?
+Yes, everything in the Need-To-Have List
 
 ## What would I do if I started this project again now?
 I think that if I started this project all over again now, I would choose to do something else. As I look at the outline for the final exam for this class, I realize that I should have chosen a project that involved object-oriented programming--considering the fact that most in-class demos were from over a week ago. The best kinds of projects to plan for are those that create more than just the "in the moment learning"; my current project just accounted for the fact that I wanted to do something well within the given time frame. 
 Disregarding the fact that I think it would have been wiser to choose a different project, I am not too annoyed at the outcome. If there's something specific that I would like to change, it would be the visual effect of "moving" a tile. Currently, my program just redraws the grid and there is no transitional moment between doing so; as a result, the effect is "choppy" and unappealing. I would have liked to investigate with some jQuery, but I was also scared that I would bust my laptop because VSCode made my laptop fan turn on. 
 
 ## What was the most challenging part of this project?
-Figuring out the logic for the sanity check was interesting but also confusing. 
+Figuring out the logic for the sanity check was interesting but also took a while to wrap my head around it (so that I could understand, integrate it into my code, and be able to explain it to someone else). 
 
 # STOPPED HERE WHILE TALKING ABOUT THE SANITY CHECK
 
