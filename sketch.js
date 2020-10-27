@@ -630,7 +630,6 @@ function shuffleGameboard() {
   if (! needHelp) { //so user does not accidentally shuffle while reading instructions
     
     //create random grid
-
     let isSolvable = false; //sanity check boolean; records whether or not the randomzied grid is solvable
 
     while (isSolvable === false) {

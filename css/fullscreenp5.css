@@ -8,6 +8,8 @@ body, html {
     display: none;
 }
  
+
+
 .gridSizeButton { 
     background-color: #FBDFDF;
     /* border: 5px solid #45252A; */
@@ -28,6 +30,8 @@ body, html {
     background-color: #9D4C5A;
     color: #FBDFDF;
 }
+
+
 
 .gameButton {
     background-color: #562F35;
