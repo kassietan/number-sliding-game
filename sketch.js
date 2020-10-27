@@ -4,18 +4,17 @@
 //
 // 
 // SOURCES
-// 
-// CSS Fade-in Effect on hover
+// 1. CSS Fade-in Effect on hover
 //  - https://www.w3schools.com/css/tryit.asp?filename=trycss_buttons_fade
 //
-// Explanations for Tile Game Solvability
+// 2. Explanations for Tile Game Solvability
 // - https://www.geeksforgeeks.org/check-instance-15-puzzle-solvable/
 // - https://www.cs.bham.ac.uk/~mdr/teaching/modules04/java2/TilesSolvability.html 
 // 
-// Explanations for Template Literals (adding expressions in multi-line strings)
+// 3. Explanations for Template Literals (adding expressions in multi-line strings)
 // - https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Template_literals 
 //
-// Using setTimeout() 
+// 4. Using setTimeout() 
 // - https://www.sitepoint.com/delay-sleep-pause-wait/ 
 
 
@@ -35,7 +34,6 @@ let rectRoundEdge;
 let widthOffset, heightOffset;
 
 let emptySpaceX, emptySpaceY;
-let numberOfInversions;
 
 let startScreen = true;
 let winState = false;
@@ -319,12 +317,8 @@ function startGameGridSize() {
     findEmptySpace();
     
     //sanity check for solvability (requires x/y values of empty space)
-    numberOfInversions = countNumberOfInversions();
-
-    isSolvable = checkSolvability();
+    isSolvable = checkSolvability();  
   }
-
-  //console.log("Number of Inversions is " + numberOfInversions);
 
   findSideLength(); //side length of the square tiles
   findOffset(); //find offset values to centre the game board vertically and horizontally
@@ -383,7 +377,7 @@ function countNumberOfInversions() {
   for (let i=0; i<some1dArray.length; i++) {
     //check all values after some1dArray[i] to see if they are less than some1dArray[i] (that would be one inversion)
     
-    for (let j = i; j<some1dArray.length; j++) {
+    for (let j = i+1; j<some1dArray.length; j++) {
       if (some1dArray[i] > some1dArray[j]) { 
         counter++;
       }
@@ -394,25 +388,32 @@ function countNumberOfInversions() {
 }
 
 function checkSolvability() {
+  let numberOfInversions;
 
-  if (gridSize % 2 === 1 && numberOfInversions % 2 === 0) { 
+  numberOfInversions = countNumberOfInversions();
+
+  console.log(numberOfInversions);
+
+  if (gridSize % 2 === 1) { 
     //gridSize is 3 or 5 and number of inversions is even
 
-    return true; //yes it is solvable
+    return numberOfInversions % 2 === 0; //number of inversions must be even to be solvable
   }
 
-  else if (gridSize % 2 === 0 && //grid size is EVEN
-        [ (emptySpaceY+1 % 2 === 1) && (numberOfInversions % 2 === 1) || 
-        //solvable if the empty space is on an ODD NUMBERED ROW (where the first row is 1) and number of inversions is odd
-        
-        (emptySpaceY+1 % 2 === 0) && (numberOfInversions % 2 === 0) ] ) { 
-        //solvable if the empty space is on an EVEN NUMBERED ROW and number of inversions is even
+  else if (gridSize % 2 === 0) {
+    //grid size is even (4)
+    
+    if ((emptySpaceY+1) % 2 === 1) {
+      //ODD-rowed empty space needs an ODD number of inversions to be solvable
+      return numberOfInversions % 2 === 1;
+    }
 
-    return true;
+    else {
+      //EVEN-rowed empty space needs an EVEN number of inversions
+      return numberOfInversions % 2 === 0;
+    }
   }
 
-  //if nothing has been returned as true; this permutation is not solvable
-  return false;
 }
 
 
